@@ -41,3 +41,51 @@ CREATE TABLE IF NOT EXISTS t_car (
     INDEX idx_user_id (user_id),
     FOREIGN KEY (user_id) REFERENCES t_user(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='车辆表';
+
+CREATE TABLE IF NOT EXISTS t_menu (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '菜单ID',
+    parent_id BIGINT DEFAULT 0 COMMENT '父菜单ID，0为顶级菜单',
+    title VARCHAR(50) NOT NULL COMMENT '菜单标题',
+    icon VARCHAR(100) COMMENT '菜单图标',
+    path VARCHAR(200) COMMENT '路由路径',
+    sort INT DEFAULT 0 COMMENT '排序',
+    create_time DATETIME COMMENT '创建时间',
+    update_time DATETIME COMMENT '更新时间',
+    deleted INT DEFAULT 0 COMMENT '逻辑删除：0-未删除，1-已删除',
+    INDEX idx_parent_id (parent_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='菜单表';
+
+CREATE TABLE IF NOT EXISTS t_role (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '角色ID',
+    name VARCHAR(50) NOT NULL UNIQUE COMMENT '角色名称',
+    description VARCHAR(200) COMMENT '角色描述',
+    create_time DATETIME COMMENT '创建时间',
+    update_time DATETIME COMMENT '更新时间',
+    deleted INT DEFAULT 0 COMMENT '逻辑删除：0-未删除，1-已删除'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
+
+CREATE TABLE IF NOT EXISTS t_role_menu (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '关联ID',
+    role_id BIGINT NOT NULL COMMENT '角色ID',
+    menu_id BIGINT NOT NULL COMMENT '菜单ID',
+    create_time DATETIME COMMENT '创建时间',
+    update_time DATETIME COMMENT '更新时间',
+    deleted INT DEFAULT 0 COMMENT '逻辑删除：0-未删除，1-已删除',
+    INDEX idx_role_id (role_id),
+    INDEX idx_menu_id (menu_id),
+    FOREIGN KEY (role_id) REFERENCES t_role(id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_id) REFERENCES t_menu(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色菜单关联表';
+
+CREATE TABLE IF NOT EXISTS t_user_role (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '关联ID',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    role_id BIGINT NOT NULL COMMENT '角色ID',
+    create_time DATETIME COMMENT '创建时间',
+    update_time DATETIME COMMENT '更新时间',
+    deleted INT DEFAULT 0 COMMENT '逻辑删除：0-未删除，1-已删除',
+    INDEX idx_user_id (user_id),
+    INDEX idx_role_id (role_id),
+    FOREIGN KEY (user_id) REFERENCES t_user(id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES t_role(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关联表';
