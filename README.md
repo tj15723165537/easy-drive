@@ -121,11 +121,6 @@ cd serve
 - 统一异常处理
 - 日志记录规范
 
-## 联系方式
-
-- 项目文档：参考 AGENTS.md
-- 技术支持：[提交Issue](https://github.com/anomalyco/opencode/issues)
-
 ## License
 
 MIT License
