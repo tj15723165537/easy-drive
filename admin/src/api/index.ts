@@ -35,7 +35,10 @@ class RequestHttp {
         axiosCanceler.addPending(config)
         config.headers!.showLoading && showFullScreenLoading()
         const token: string = useGlobalStore.getState().token
-        return { ...config, headers: { ...config.headers, token: token } }
+        if (token) {
+          return { ...config, headers: { ...config.headers, Authorization: `Bearer ${token}` } }
+        }
+        return config
       },
       (error: AxiosError) => {
         return Promise.reject(error)

@@ -11,7 +11,7 @@ Mock.mock('/api/auth/menu', 'get', {
     {
       icon: 'HomeOutlined',
       title: '首页',
-      path: '/home/index',
+      path: '/home',
     },
     {
       icon: 'SettingOutlined',

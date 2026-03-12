@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Remove-Item -Path 'F:\\\\code\\\\private\\\\easy-drive\\\\serve\\\\src\\\\main\\\\java\\\\com\\\\easy\\\\drive\\\\serve\\\\controller\\\\DebugController.java' -Force\")"
+    ]
+  }
+}

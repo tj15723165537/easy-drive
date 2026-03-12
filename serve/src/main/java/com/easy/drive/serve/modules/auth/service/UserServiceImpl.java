@@ -6,13 +6,21 @@ import com.easy.drive.serve.common.exception.BusinessException;
 import com.easy.drive.serve.common.util.JwtUtil;
 import com.easy.drive.serve.modules.auth.dto.LoginRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.RegisterRequestDTO;
+import com.easy.drive.serve.modules.system.menu.entity.Menu;
+import com.easy.drive.serve.modules.system.menu.mapper.MenuMapper;
+import com.easy.drive.serve.modules.system.menu.vo.MenuVO;
 import com.easy.drive.serve.modules.system.user.entity.User;
 import com.easy.drive.serve.modules.auth.mapper.UserMapper;
 import com.easy.drive.serve.modules.auth.vo.LoginResponseVO;
 import com.easy.drive.serve.modules.auth.vo.UserInfoVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @org.springframework.context.annotation.Primary
@@ -26,6 +34,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private MenuMapper menuMapper;
 
     @Override
     public LoginResponseVO login(LoginRequestDTO request) {
@@ -92,5 +103,32 @@ public class UserServiceImpl implements IUserService {
         userInfo.setStatus(user.getStatus());
         userInfo.setCreateTime(user.getCreateTime());
         return userInfo;
+    }
+
+    @Override
+    public List<MenuVO> getUserMenu(Long userId) {
+        List<Menu> menus = menuMapper.selectMenusByUserId(userId);
+        List<MenuVO> menuVOs = menus.stream()
+                .map(this::convertToMenuVO)
+                .collect(Collectors.toList());
+        return buildMenuTree(menuVOs, 0L);
+    }
+
+    private MenuVO convertToMenuVO(Menu menu) {
+        MenuVO vo = new MenuVO();
+        BeanUtils.copyProperties(menu, vo);
+        return vo;
+    }
+
+    private List<MenuVO> buildMenuTree(List<MenuVO> menuList, Long parentId) {
+        List<MenuVO> tree = new ArrayList<>();
+        for (MenuVO menu : menuList) {
+            if (menu.getParentId().equals(parentId)) {
+                List<MenuVO> children = buildMenuTree(menuList, menu.getId());
+                menu.setChildren(children);
+                tree.add(menu);
+            }
+        }
+        return tree;
     }
 }

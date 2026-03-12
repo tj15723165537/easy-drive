@@ -6,12 +6,15 @@ import com.easy.drive.serve.modules.auth.dto.RegisterRequestDTO;
 import com.easy.drive.serve.modules.auth.service.IUserService;
 import com.easy.drive.serve.modules.auth.vo.LoginResponseVO;
 import com.easy.drive.serve.modules.auth.vo.UserInfoVO;
+import com.easy.drive.serve.modules.system.menu.vo.MenuVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -41,5 +44,13 @@ public class AuthController {
         Long userId = (Long) authentication.getPrincipal();
         UserInfoVO userInfo = userService.getUserInfo(userId);
         return Result.success(userInfo);
+    }
+
+    @GetMapping("/menu")
+    @Operation(summary = "获取用户菜单", description = "根据JWT Token获取当前登录用户的菜单列表")
+    public Result<List<MenuVO>> getMenu(Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
+        List<MenuVO> menuList = userService.getUserMenu(userId);
+        return Result.success(menuList);
     }
 }
