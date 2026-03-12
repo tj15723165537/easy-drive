@@ -4,6 +4,7 @@ import com.easy.drive.serve.common.result.Result;
 import com.easy.drive.serve.modules.auth.dto.LoginRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.RegisterRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.UpdatePasswordDTO;
+import com.easy.drive.serve.modules.auth.dto.UpdateProfileDTO;
 import com.easy.drive.serve.modules.auth.service.IUserService;
 import com.easy.drive.serve.modules.auth.vo.LoginResponseVO;
 import com.easy.drive.serve.modules.auth.vo.UserInfoVO;
@@ -60,6 +61,14 @@ public class AuthController {
     public Result<Void> updatePassword(@Valid @RequestBody UpdatePasswordDTO dto, Authentication authentication) {
         Long userId = (Long) authentication.getPrincipal();
         userService.updatePassword(userId, dto);
+        return Result.success();
+    }
+
+    @PutMapping("/profile")
+    @Operation(summary = "更新个人资料", description = "当前登录用户更新自己的昵称、手机号和头像")
+    public Result<Void> updateProfile(@Valid @RequestBody UpdateProfileDTO dto, Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
+        userService.updateProfile(userId, dto);
         return Result.success();
     }
 }

@@ -28,3 +28,8 @@ export const getMenuList = () => {
 export const updatePasswordApi = (params: Login.ReqUpdatePasswordForm) => {
   return http.post('/auth/updatePassword', params)
 }
+
+// * 更新个人信息
+export const updateProfileApi = (params: { nickname: string; phone: string; avatar?: string }) => {
+  return http.put('/auth/profile', params)
+}

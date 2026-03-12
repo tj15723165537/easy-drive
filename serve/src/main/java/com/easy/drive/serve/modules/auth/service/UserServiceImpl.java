@@ -7,6 +7,7 @@ import com.easy.drive.serve.common.util.JwtUtil;
 import com.easy.drive.serve.modules.auth.dto.LoginRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.RegisterRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.UpdatePasswordDTO;
+import com.easy.drive.serve.modules.auth.dto.UpdateProfileDTO;
 import com.easy.drive.serve.modules.system.menu.entity.Menu;
 import com.easy.drive.serve.modules.system.menu.mapper.MenuMapper;
 import com.easy.drive.serve.modules.system.menu.vo.MenuVO;
@@ -129,6 +130,20 @@ public class UserServiceImpl implements IUserService {
 
         // 更新密码
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userMapper.updateById(user);
+    }
+
+    @Override
+    public void updateProfile(Long userId, UpdateProfileDTO dto) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_EXIST);
+        }
+
+        // 更新昵称、手机号和头像
+        user.setNickname(dto.getNickname());
+        user.setPhone(dto.getPhone());
+        user.setAvatar(dto.getAvatar());
         userMapper.updateById(user);
     }
 

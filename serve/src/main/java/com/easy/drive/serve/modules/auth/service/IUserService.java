@@ -3,6 +3,7 @@ package com.easy.drive.serve.modules.auth.service;
 import com.easy.drive.serve.modules.auth.dto.LoginRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.RegisterRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.UpdatePasswordDTO;
+import com.easy.drive.serve.modules.auth.dto.UpdateProfileDTO;
 import com.easy.drive.serve.modules.auth.vo.LoginResponseVO;
 import com.easy.drive.serve.modules.auth.vo.UserInfoVO;
 import com.easy.drive.serve.modules.system.menu.vo.MenuVO;
@@ -20,4 +21,6 @@ public interface IUserService {
     List<MenuVO> getUserMenu(Long userId);
 
     void updatePassword(Long userId, UpdatePasswordDTO dto);
+
+    void updateProfile(Long userId, UpdateProfileDTO dto);
 }

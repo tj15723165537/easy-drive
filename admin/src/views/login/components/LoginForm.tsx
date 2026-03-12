@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Form, Input, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { Login } from '@/api/interface'
@@ -16,6 +16,11 @@ const LoginForm = () => {
   const setTabsList = useTabsStore((s) => s.setTabsList)
   const navigate = useNavigate()
   const [form] = Form.useForm()
+
+  useEffect(() => {
+    form.setFieldValue('username', 'admin')
+    form.setFieldValue('password', '123456')
+  }, [])
   const [loading, setLoading] = useState<boolean>(false)
 
   // 登录

@@ -4,7 +4,8 @@
       "Bash(powershell -Command \"Remove-Item -Path 'F:\\\\code\\\\private\\\\easy-drive\\\\serve\\\\src\\\\main\\\\java\\\\com\\\\easy\\\\drive\\\\serve\\\\controller\\\\DebugController.java' -Force\")",
       "Bash(cd /f/code/private/easy-drive/serve && ./mvnw clean compile -DskipTests 2>&1 | head -100)",
       "Bash(cd /f/code/private/easy-drive/admin && npm run build:dev 2>&1 | head -100)",
-      "Bash(cd /f/code/private/easy-drive/serve && ./mvnw compile -DskipTests)"
+      "Bash(cd /f/code/private/easy-drive/serve && ./mvnw compile -DskipTests)",
+      "Bash(cd admin:*)"
     ]
   }
 }

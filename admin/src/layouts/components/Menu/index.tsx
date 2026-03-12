@@ -76,13 +76,38 @@ const LayoutMenu = () => {
     try {
       const { data } = await getMenuList()
       if (!data) return
-      setMenuList(deepLoopFloat(data))
+
+      // 检查是否包含首页菜单
+      const hasHome = data.some((menu) => menu.path === '/home')
+
+      // 如果没有首页，添加默认首页菜单
+      let finalMenus = data
+      if (!hasHome) {
+        const homeMenu: Menu.MenuOptions = {
+          path: '/home',
+          title: '首页',
+          icon: 'HomeOutlined',
+          children: [],
+        }
+        // 添加到最前面
+        finalMenus = [homeMenu, ...data]
+      }
+
+      setMenuList(deepLoopFloat(finalMenus))
       // 存储处理过后的所有面包屑导航栏到 redux 中
-      setBreadcrumbList(findAllBreadcrumb(data))
+      setBreadcrumbList(
+        findAllBreadcrumb([
+          ...finalMenus,
+          {
+            path: '/profile',
+            title: '个人中心',
+          },
+        ])
+      )
       // 把路由菜单处理成一维数组，存储到 redux 中，做菜单权限判断
-      const dynamicRouter = handleRouter(data)
+      const dynamicRouter = handleRouter(finalMenus)
       setAuthRouter(dynamicRouter)
-      setMenuListAction(data)
+      setMenuListAction(finalMenus)
     } finally {
       setLoading(false)
     }
