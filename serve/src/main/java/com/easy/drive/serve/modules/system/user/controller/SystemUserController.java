@@ -1,6 +1,6 @@
 package com.easy.drive.serve.modules.system.user.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.easy.drive.serve.common.result.PageResult;
 import com.easy.drive.serve.common.result.Result;
 import com.easy.drive.serve.modules.system.user.dto.UserDTO;
 import com.easy.drive.serve.modules.system.user.service.ISystemUserService;
@@ -22,11 +22,11 @@ public class SystemUserController {
 
     @GetMapping("/page")
     @Operation(summary = "分页获取用户列表", description = "根据条件分页查询用户")
-    public Result<Page<UserVO>> getUserPage(
-            @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer pageNum,
+    public Result<PageResult<UserVO>> getUserPage(
+            @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer current,
             @Parameter(description = "每页大小") @RequestParam(defaultValue = "10") Integer pageSize,
             @Parameter(description = "用户名") @RequestParam(required = false) String username) {
-        Page<UserVO> page = userService.getUserPage(pageNum, pageSize, username);
+        PageResult<UserVO> page = userService.getUserPage(current, pageSize, username);
         return Result.success(page);
     }
 

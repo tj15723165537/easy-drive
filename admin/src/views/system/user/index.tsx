@@ -22,6 +22,7 @@ const UserPage = () => {
   const columns: TableColumnsType<UserVO> = [
     { title: '账号', dataIndex: 'username', align: 'center' },
     { title: '昵称', dataIndex: 'nick_name', align: 'center' },
+    { title: '手机号', dataIndex: 'phone', align: 'center' },
     { title: '创建时间', dataIndex: 'created_at', align: 'center' },
     { title: '更新时间', dataIndex: 'updated_at', align: 'center' },
     {

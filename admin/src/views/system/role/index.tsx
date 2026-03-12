@@ -62,7 +62,7 @@ const RolePage = () => {
         <Form form={form} onFinish={handleSearch} layout="inline">
           <Row gutter={[16, 16]} style={{ width: '100%' }}>
             <Col {...SearchColSpan}>
-              <Form.Item name="name" label="姓名">
+              <Form.Item name="name" label="角色名称">
                 <Input placeholder="请输入" />
               </Form.Item>
             </Col>

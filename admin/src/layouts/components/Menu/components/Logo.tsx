@@ -6,7 +6,7 @@ const Logo = () => {
   return (
     <div className="logo-box">
       <img src={logo} alt="logo" className="logo-img" />
-      {!isCollapse ? <h2 className="logo-text">Ark Admin</h2> : null}
+      {!isCollapse ? <h2 className="logo-text">Easy Drive</h2> : null}
     </div>
   )
 }

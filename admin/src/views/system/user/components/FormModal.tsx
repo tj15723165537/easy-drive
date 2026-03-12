@@ -90,6 +90,9 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
           <Form.Item name="nick_name" label="昵称" rules={[{ required: true, message: '请输入昵称' }]}>
             <Input placeholder="请输入" disabled={isDisabled} />
           </Form.Item>
+          <Form.Item name="phone" label="手机号" rules={[{ required: true, message: '请输入手机号' }, { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确' }]}>
+            <Input placeholder="请输入" disabled={isDisabled} maxLength={11} />
+          </Form.Item>
           <Form.Item name="roleId" label="角色" rules={[{ required: true, message: '请选择' }]}>
             <Radio.Group
               onChange={(v) => {

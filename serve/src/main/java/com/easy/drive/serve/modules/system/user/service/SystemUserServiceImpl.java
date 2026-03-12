@@ -1,11 +1,13 @@
-package com.easy.drive.serve.modules.system;
+package com.easy.drive.serve.modules.system.user.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.easy.drive.serve.common.exception.BusinessException;
+import com.easy.drive.serve.common.result.PageResult;
+import com.easy.drive.serve.modules.system.SystemUserMapper;
+import com.easy.drive.serve.modules.system.UserRoleMapper;
 import com.easy.drive.serve.modules.system.user.dto.UserDTO;
 import com.easy.drive.serve.modules.system.user.entity.UserRole;
-import com.easy.drive.serve.modules.system.user.service.ISystemUserService;
 import com.easy.drive.serve.modules.system.user.vo.UserVO;
 import com.easy.drive.serve.modules.system.user.entity.User;
 import org.springframework.beans.BeanUtils;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,22 +24,22 @@ import java.util.stream.Collectors;
 public class SystemUserServiceImpl implements ISystemUserService {
 
     @Autowired
-    private com.easy.drive.serve.modules.system.SystemUserMapper systemUserMapper;
+    private SystemUserMapper systemUserMapper;
 
     @Autowired
-    private com.easy.drive.serve.modules.system.UserRoleMapper userRoleMapper;
+    private UserRoleMapper userRoleMapper;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
-    public Page<UserVO> getUserPage(Integer pageNum, Integer pageSize, String username) {
-        Page<User> page = new Page<>(pageNum, pageSize);
+    public PageResult<UserVO> getUserPage(Integer current, Integer pageSize, String username) {
+        Page<User> page = new Page<>(current, pageSize);
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         if (username != null && !username.isEmpty()) {
             wrapper.like(User::getUsername, username);
         }
         Page<User> userPage = systemUserMapper.selectPage(page, wrapper);
-        return convertToPageVO(userPage);
+        return convertToPageResult(userPage);
     }
 
     @Override
@@ -114,15 +117,23 @@ public class SystemUserServiceImpl implements ISystemUserService {
     private UserVO convertToVO(User user) {
         UserVO vo = new UserVO();
         BeanUtils.copyProperties(user, vo);
+
+        // 查询用户的角色ID（处理一个用户多个角色的情况）
+        LambdaQueryWrapper<UserRole> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserRole::getUserId, user.getId());
+        List<UserRole> userRoles = userRoleMapper.selectList(wrapper);
+        if (!userRoles.isEmpty()) {
+            vo.setRoleId(userRoles.get(0).getRoleId());
+        }
+
         return vo;
     }
 
-    private Page<UserVO> convertToPageVO(Page<User> userPage) {
-        Page<UserVO> pageVO = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
-        pageVO.setRecords(userPage.getRecords()
+    private PageResult<UserVO> convertToPageResult(Page<User> userPage) {
+        List<UserVO> records = userPage.getRecords()
                 .stream()
                 .map(this::convertToVO)
-                .collect(Collectors.toList()));
-        return pageVO;
+                .collect(Collectors.toList());
+        return new PageResult<>(records, userPage.getTotal());
     }
 }

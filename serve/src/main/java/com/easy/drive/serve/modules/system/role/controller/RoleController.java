@@ -1,6 +1,6 @@
 package com.easy.drive.serve.modules.system.role.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.easy.drive.serve.common.result.PageResult;
 import com.easy.drive.serve.common.result.Result;
 import com.easy.drive.serve.modules.system.role.dto.RoleDTO;
 import com.easy.drive.serve.modules.system.role.service.IRoleService;
@@ -24,11 +24,11 @@ public class RoleController {
 
     @GetMapping("/page")
     @Operation(summary = "分页获取角色列表", description = "根据条件分页查询角色")
-    public Result<Page<RoleVO>> getRolePage(
-            @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer pageNum,
+    public Result<PageResult<RoleVO>> getRolePage(
+            @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer current,
             @Parameter(description = "每页大小") @RequestParam(defaultValue = "10") Integer pageSize,
             @Parameter(description = "角色名称") @RequestParam(required = false) String name) {
-        Page<RoleVO> page = roleService.getRolePage(pageNum, pageSize, name);
+        PageResult<RoleVO> page = roleService.getRolePage(current, pageSize, name);
         return Result.success(page);
     }
 

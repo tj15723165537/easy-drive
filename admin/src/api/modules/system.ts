@@ -46,6 +46,9 @@ export interface UserVO {
   id: number
   username: string
   nick_name: string
+  phone: string
+  status: number
+  roleId?: number
   created_at: string
   updated_at: string
 }
@@ -53,10 +56,11 @@ export interface UserDTO {
   id?: number
   username?: string
   nick_name?: string
+  phone?: string
   roleId?: number
   status?: number
 }
-export interface UserPageParams {
+export interface UserPageParams extends BaseParams {
   username?: string
 }
 
@@ -168,7 +172,7 @@ export interface RoleDTO {
   description?: string
   menuIds?: number[]
 }
-export interface RolePageParams {
+export interface RolePageParams extends BaseParams {
   name?: string
 }
 

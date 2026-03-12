@@ -3,6 +3,7 @@ package com.easy.drive.serve.modules.system.role.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.easy.drive.serve.common.exception.BusinessException;
+import com.easy.drive.serve.common.result.PageResult;
 import com.easy.drive.serve.modules.system.role.dto.RoleDTO;
 import com.easy.drive.serve.modules.system.role.entity.Role;
 import com.easy.drive.serve.modules.system.role.entity.RoleMenu;
@@ -28,14 +29,14 @@ public class RoleServiceImpl implements IRoleService {
     private RoleMenuMapper roleMenuMapper;
 
     @Override
-    public Page<RoleVO> getRolePage(Integer pageNum, Integer pageSize, String name) {
-        Page<Role> page = new Page<>(pageNum, pageSize);
+    public PageResult<RoleVO> getRolePage(Integer current, Integer pageSize, String name) {
+        Page<Role> page = new Page<>(current, pageSize);
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         if (name != null && !name.isEmpty()) {
             wrapper.like(Role::getName, name);
         }
         Page<Role> rolePage = roleMapper.selectPage(page, wrapper);
-        return convertToPageVO(rolePage);
+        return convertToPageResult(rolePage);
     }
 
     @Override
@@ -126,13 +127,11 @@ public class RoleServiceImpl implements IRoleService {
         return vo;
     }
 
-    private Page<RoleVO> convertToPageVO(Page<Role> rolePage) {
-        Page<RoleVO> pageVO = new Page<>(rolePage.getCurrent(), rolePage.getSize(), rolePage.getTotal());
+    private PageResult<RoleVO> convertToPageResult(Page<Role> rolePage) {
         List<RoleVO> records = rolePage.getRecords()
                 .stream()
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
-        pageVO.setRecords(records);
-        return pageVO;
+        return new PageResult<>(records, rolePage.getTotal());
     }
 }
