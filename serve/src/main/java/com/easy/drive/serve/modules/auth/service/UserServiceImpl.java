@@ -6,6 +6,7 @@ import com.easy.drive.serve.common.exception.BusinessException;
 import com.easy.drive.serve.common.util.JwtUtil;
 import com.easy.drive.serve.modules.auth.dto.LoginRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.RegisterRequestDTO;
+import com.easy.drive.serve.modules.auth.dto.UpdatePasswordDTO;
 import com.easy.drive.serve.modules.system.menu.entity.Menu;
 import com.easy.drive.serve.modules.system.menu.mapper.MenuMapper;
 import com.easy.drive.serve.modules.system.menu.vo.MenuVO;
@@ -112,6 +113,23 @@ public class UserServiceImpl implements IUserService {
                 .map(this::convertToMenuVO)
                 .collect(Collectors.toList());
         return buildMenuTree(menuVOs, 0L);
+    }
+
+    @Override
+    public void updatePassword(Long userId, UpdatePasswordDTO dto) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_EXIST);
+        }
+
+        // 验证当前密码是否正确
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new BusinessException(ResultCode.PASSWORD_ERROR);
+        }
+
+        // 更新密码
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userMapper.updateById(user);
     }
 
     private MenuVO convertToMenuVO(Menu menu) {

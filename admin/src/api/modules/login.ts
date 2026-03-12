@@ -6,6 +6,19 @@ export const loginApi = (params: Login.ReqLoginForm) => {
   return http.post<Login.ResLogin>('/auth/login', params)
 }
 
+// * 获取用户信息
+export const getUserInfoApi = () => {
+  return http.get<{
+    id: number
+    username: string
+    nickname: string
+    phone: string
+    avatar: string
+    status: number
+    createTime: string
+  }>('/auth/userInfo')
+}
+
 // * 获取菜单列表
 export const getMenuList = () => {
   return http.get<Menu.MenuOptions[]>('/auth/menu')

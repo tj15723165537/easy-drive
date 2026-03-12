@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, Form, Input, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { Login } from '@/api/interface'
-import { loginApi } from '@/api/modules/login'
+import { loginApi, getUserInfoApi } from '@/api/modules/login'
 import { HOME_URL } from '@/config/config'
 import { useTranslation } from 'react-i18next'
 import { UserOutlined, LockOutlined, CloseCircleOutlined } from '@ant-design/icons'
@@ -12,6 +12,7 @@ import useTabsStore from '@/store/tabs'
 const LoginForm = () => {
   const { t } = useTranslation()
   const setToken = useGlobalStore((s) => s.setToken)
+  const setUserInfo = useGlobalStore((s) => s.setUserInfo)
   const setTabsList = useTabsStore((s) => s.setTabsList)
   const navigate = useNavigate()
   const [form] = Form.useForm()
@@ -23,6 +24,13 @@ const LoginForm = () => {
       setLoading(true)
       const { data } = await loginApi(loginForm)
       setToken(data?.token!)
+
+      // 获取用户信息
+      const userInfoRes = await getUserInfoApi()
+      if (userInfoRes.data) {
+        setUserInfo(userInfoRes.data)
+      }
+
       setTabsList([])
       message.success('登录成功！')
       navigate(HOME_URL)

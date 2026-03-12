@@ -21,7 +21,9 @@ const PasswordModal = (props: Props) => {
 
   const handleOk = async () => {
     const formData = await form.validateFields()
-    await updatePasswordApi(formData)
+    // 只发送后端需要的字段
+    const { oldPassword, newPassword } = formData
+    await updatePasswordApi({ oldPassword, newPassword })
     setIsModalVisible(false)
     message.success('修改密码成功 🎉🎉🎉')
   }

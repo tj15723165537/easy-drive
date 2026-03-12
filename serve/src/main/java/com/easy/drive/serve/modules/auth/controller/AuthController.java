@@ -3,6 +3,7 @@ package com.easy.drive.serve.modules.auth.controller;
 import com.easy.drive.serve.common.result.Result;
 import com.easy.drive.serve.modules.auth.dto.LoginRequestDTO;
 import com.easy.drive.serve.modules.auth.dto.RegisterRequestDTO;
+import com.easy.drive.serve.modules.auth.dto.UpdatePasswordDTO;
 import com.easy.drive.serve.modules.auth.service.IUserService;
 import com.easy.drive.serve.modules.auth.vo.LoginResponseVO;
 import com.easy.drive.serve.modules.auth.vo.UserInfoVO;
@@ -52,5 +53,13 @@ public class AuthController {
         Long userId = (Long) authentication.getPrincipal();
         List<MenuVO> menuList = userService.getUserMenu(userId);
         return Result.success(menuList);
+    }
+
+    @PostMapping("/updatePassword")
+    @Operation(summary = "修改密码", description = "当前登录用户修改自己的密码")
+    public Result<Void> updatePassword(@Valid @RequestBody UpdatePasswordDTO dto, Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
+        userService.updatePassword(userId, dto);
+        return Result.success();
     }
 }
