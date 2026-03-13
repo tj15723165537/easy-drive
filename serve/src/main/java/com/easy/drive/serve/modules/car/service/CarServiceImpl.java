@@ -128,16 +128,13 @@ public class CarServiceImpl implements ICarService {
 
     private CarPageVO convertToPageVO(Page<Car> carPage) {
         CarPageVO pageVO = new CarPageVO();
-        pageVO.setCurrent(carPage.getCurrent());
-        pageVO.setSize(carPage.getSize());
         pageVO.setTotal(carPage.getTotal());
-        pageVO.setPages(carPage.getPages());
-        
+
         List<CarInfoVO> records = carPage.getRecords()
                 .stream()
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
-        pageVO.setRecords(records);
+        pageVO.setList(records);
         
         return pageVO;
     }

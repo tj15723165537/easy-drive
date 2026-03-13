@@ -42,6 +42,6 @@ public class CarUpdateDTO {
     @Schema(description = "位置", example = "北京市朝阳区")
     private String location;
 
-    @Schema(description = "状态：1-在售，0-已售", example = "1")
+    @Schema(description = "状态：1-已上线，0-已下线", example = "1")
     private Integer status;
 }

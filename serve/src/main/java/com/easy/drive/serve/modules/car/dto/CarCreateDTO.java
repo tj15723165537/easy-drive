@@ -49,7 +49,10 @@ public class CarCreateDTO {
     @Schema(description = "图片URL(逗号分隔)", example = "/uploads/image1.jpg,/uploads/image2.jpg")
     private String images;
 
-    @NotBlank(message = "位置不能为空")
-    @Schema(description = "车辆位置", example = "北京市朝阳区", required = true)
+    @NotBlank(message = "地址不能为空")
+    @Schema(description = "车辆地址", example = "北京市朝阳区", required = true)
     private String location;
+
+    @Schema(description = "状态：1-已上线，0-已下线", example = "1")
+    private Integer status;
 }
