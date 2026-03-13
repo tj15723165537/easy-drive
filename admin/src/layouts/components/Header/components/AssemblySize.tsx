@@ -1,5 +1,6 @@
 import { Dropdown } from 'antd'
 import useGlobalStore from '@/store'
+import { SizeType } from 'antd/es/config-provider/SizeContext'
 
 const AssemblySize = () => {
   const assemblySize = useGlobalStore((s) => s.assemblySize)
@@ -7,7 +8,7 @@ const AssemblySize = () => {
 
   // 切换组件大小
   const onClick = (e: MenuInfo) => {
-    setAssemblySize(e.key)
+    setAssemblySize(e.key as SizeType)
   }
 
   const menuItems = [

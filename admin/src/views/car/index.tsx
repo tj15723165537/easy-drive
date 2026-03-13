@@ -1,9 +1,11 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { TableColumnsType, Tag, Select } from 'antd'
 import { Button, Card, Col, Form, Input, InputNumber, message, Popconfirm, Row, Space, Table } from 'antd'
 import FormModal from './components/FormModal'
+import DetailModal from './components/DetailModal'
 import { SearchColSpan } from '@/config/layout'
-import { deleteCar, searchCars, CarPageParams, CarVO } from '@/api/modules/car'
+import { deleteCar, getCarDetail, searchCars, CarPageParams, CarVO } from '@/api/modules/car'
+import { useRequest } from 'ahooks'
 import { usePagination } from 'ahooks'
 import { BaseParams, ResPage } from '@/api/interface'
 
@@ -11,10 +13,22 @@ const { Option } = Select
 
 const CarPagePage = () => {
   const formModalRef = useRef<any>()
+  const [detailVisible, setDetailVisible] = useState(false)
+  const [detailData, setDetailData] = useState<CarVO | null>(null)
   const [form] = Form.useForm()
-  const showModal = (type: ActionType, id?: number) => {
-    formModalRef.current.showModal(type, id)
+
+  const showEditModal = (id?: number) => {
+    formModalRef.current.showModal('edit', id)
   }
+
+  const showDetailModal = async (id: number) => {
+    setDetailVisible(true)
+    const result = await getCarDetail(id)
+    if (result.data) {
+      setDetailData(result.data)
+    }
+  }
+
   const handleDelete = async (record: CarVO) => {
     await deleteCar(record.id)
     message.success('操作成功')
@@ -60,8 +74,8 @@ const CarPagePage = () => {
       key: 'action',
       render: (_, record: CarVO) => (
         <Space size="middle">
-          <a onClick={() => showModal('view', record.id)}>查看</a>
-          <a onClick={() => showModal('edit', record.id)}>编辑</a>
+          <a onClick={() => showDetailModal(record.id)}>查看</a>
+          <a onClick={() => showEditModal(record.id)}>编辑</a>
           <Popconfirm title="确定删除吗？" onConfirm={() => handleDelete(record)} okText="确定" cancelText="取消">
             <a>删除</a>
           </Popconfirm>
@@ -138,7 +152,7 @@ const CarPagePage = () => {
       <Card
         title={
           <Space>
-            <Button type="primary" onClick={() => showModal('add')}>
+            <Button type="primary" onClick={() => formModalRef.current.showModal('add')}>
               新增车辆
             </Button>
           </Space>
@@ -161,6 +175,7 @@ const CarPagePage = () => {
           }}
         />
         <FormModal myRef={formModalRef} onRefresh={refresh} />
+        <DetailModal visible={detailVisible} onClose={() => setDetailVisible(false)} carData={detailData} />
       </Card>
     </>
   )

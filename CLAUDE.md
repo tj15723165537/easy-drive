@@ -97,21 +97,6 @@ npx prettier --write "src/**/*.{ts,tsx,js,jsx,less,css,json}"
 
 ```bash
 cd serve
-
-# 编译项目
-./mvnw clean compile
-
-# 运行应用
-./mvnw spring-boot:run
-
-# 运行所有测试
-./mvnw test
-
-# 运行单个测试
-./mvnw test -Dtest=类名#方法名
-
-# 打包JAR
-./mvnw clean package
 ```
 
 ## 开发规范

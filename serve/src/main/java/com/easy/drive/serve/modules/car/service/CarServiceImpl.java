@@ -10,6 +10,7 @@ import com.easy.drive.serve.modules.car.entity.Car;
 import com.easy.drive.serve.modules.car.mapper.CarMapper;
 import com.easy.drive.serve.modules.car.vo.CarInfoVO;
 import com.easy.drive.serve.modules.car.vo.CarPageVO;
+import com.easy.drive.serve.modules.auth.mapper.UserMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,23 @@ public class CarServiceImpl implements ICarService {
     @Autowired
     private CarMapper carMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public Long createCar(CarCreateDTO dto, Long userId) {
         Car car = new Car();
-        BeanUtils.copyProperties(dto, car);
+        car.setBrand(dto.getBrand());
+        car.setModel(dto.getModel());
+        car.setPrice(dto.getPrice());
+        car.setMileage(dto.getMileage());
+        car.setYear(dto.getYear());
+        car.setColor(dto.getColor());
+        car.setFuelType(dto.getFuelType());
+        car.setTransmission(dto.getTransmission());
+        car.setDescription(dto.getDescription());
+        car.setImages(dto.getImages());
+        car.setLocation(dto.getLocation());
         car.setUserId(userId);
         car.setStatus(1);
         carMapper.insert(car);
@@ -116,13 +130,24 @@ public class CarServiceImpl implements ICarService {
     private CarInfoVO convertToVO(Car car) {
         CarInfoVO vo = new CarInfoVO();
         BeanUtils.copyProperties(car, vo);
-        
-        List<String> imageList = Arrays.asList(car.getImages().split(","))
-                .stream()
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
+
+        // 处理图片列表，避免空字符串导致问题
+        String images = car.getImages();
+        List<String> imageList = new java.util.ArrayList<>();
+        if (images != null && !images.isEmpty()) {
+            imageList = Arrays.asList(images.split(","))
+                    .stream()
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+        }
         vo.setImageList(imageList);
-        
+
+        // 根据 userId 查询用户名
+        if (car.getUserId() != null) {
+            String username = userMapper.getUsernameById(car.getUserId());
+            vo.setUsername(username);
+        }
+
         return vo;
     }
 

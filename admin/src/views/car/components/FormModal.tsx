@@ -80,7 +80,10 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
       if (actionType === 'add') {
         await createCar(data)
       } else {
-        await updateCar(data)
+        await updateCar({
+					...data,
+					id
+				})
       }
     },
     {
