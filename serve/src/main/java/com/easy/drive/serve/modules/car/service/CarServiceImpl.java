@@ -38,12 +38,10 @@ public class CarServiceImpl implements ICarService {
         car.setPrice(dto.getPrice());
         car.setMileage(dto.getMileage());
         car.setYear(dto.getYear());
-        car.setColor(dto.getColor());
         car.setFuelType(dto.getFuelType());
         car.setTransmission(dto.getTransmission());
         car.setDescription(dto.getDescription());
         car.setImages(dto.getImages());
-        car.setLocation(dto.getLocation());
         car.setUserId(userId);
         car.setStatus(1);
         carMapper.insert(car);

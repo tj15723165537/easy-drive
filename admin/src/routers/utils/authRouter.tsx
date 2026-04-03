@@ -16,7 +16,9 @@ const AuthRouter = (props: { children: JSX.Element }) => {
 
   // * 判断是否有Token
   const token = useGlobalStore.getState().token
-  if (!token) return <Navigate to="/login" replace />
+  // * 无需登录的白名单路由
+  const whiteList = ['/login', '/404', '/403', '/500']
+  if (!token && !whiteList.includes(pathname)) return <Navigate to="/login" replace />
 
   // * Dynamic Router(动态路由，根据后端返回的菜单数据生成的一维数组)
   const dynamicRouter = useAuthStore.getState().authRouter

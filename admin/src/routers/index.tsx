@@ -1,5 +1,7 @@
 import { Navigate, useRoutes } from 'react-router-dom'
 import Login from '@/views/login/index'
+import Profile from '@/views/profile'
+import { LayoutIndex } from '@/routers/constant'
 import useMenuStore from '@/store/menu'
 import { generateDynamicRoutes } from '@/routers/routeModules'
 import { HOME_URL } from '@/config/config'
@@ -21,6 +23,15 @@ const Router = () => {
         title: '登录页',
         key: 'login',
       },
+    },
+    {
+      element: <LayoutIndex />,
+      children: [
+        {
+          path: '/profile',
+          element: <Profile />,
+        },
+      ],
     },
     {
       path: '*',

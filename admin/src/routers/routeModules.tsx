@@ -68,13 +68,24 @@ export const generateDynamicRoutes = (menuList: Menu.MenuOptions[]): RouteObject
         const loadFn = routeModules[menu.path]
         if (loadFn) {
           result.push({
-            path: menu.path,
-            element: lazyLoad(React.lazy(loadFn)),
+            // 叶子路由也需要 Layout 包裹
+            element: <LayoutIndex />,
             meta: {
-              requiresAuth: true,
               title: menu.title,
+              icon: menu.icon,
               key: menu.path,
             },
+            children: [
+              {
+                path: menu.path,
+                element: lazyLoad(React.lazy(loadFn)),
+                meta: {
+                  requiresAuth: true,
+                  title: menu.title,
+                  key: menu.path,
+                },
+              },
+            ],
           })
         }
       }

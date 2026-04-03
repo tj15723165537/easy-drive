@@ -33,7 +33,8 @@
 			}
 		}
 		.login-form {
-			padding: 40px 45px 25px;
+			padding: 30px 40px 20px;
+			width: 360px;
 			border-radius: 10px;
 			.login-logo {
 				display: flex;
@@ -45,24 +46,24 @@
 				}
 				.logo-text {
 					padding-left: 25px;
-					font-size: 48px;
+					font-size: 32px;
 					font-weight: bold;
 					white-space: nowrap;
 				}
 			}
-			.ant-form-item {
-				height: 75px;
-				margin-bottom: 0;
+				.ant-form-item {
+					height: 64px;
+					margin-bottom: 0;
 				.ant-input-prefix {
 					margin-right: 10px;
 				}
 				.ant-input-affix-wrapper-lg {
 					padding: 8.3px 11px;
 				}
-				.ant-input-affix-wrapper,
-				.ant-input-lg {
-					font-size: 14px;
-				}
+					.ant-input-affix-wrapper,
+					.ant-input-lg {
+						font-size: 13px;
+					}
 				.ant-input-affix-wrapper {
 					color: #bfbfbf;
 				}
@@ -73,12 +74,38 @@
 				white-space: nowrap;
 				.ant-form-item-control-input-content {
 					display: flex;
+					gap: 12px;
 					justify-content: space-between;
 					.ant-btn {
-						width: 180px;
+						width: 100%;
+						height: 44px;
+						border-radius: 8px;
+						font-weight: 600;
+						transition: all 0.2s ease;
+						display: inline-flex;
+						align-items: center;
+						justify-content: center;
+						gap: 6px;
+						padding: 0 18px;
 						span {
 							font-size: 14px;
+							line-height: 1;
 						}
+						.anticon {
+							font-size: 16px;
+						}
+					}
+					.ant-btn:not(.ant-btn-primary) {
+						background: #fff;
+						border-color: #d9d9d9;
+						color: #434343;
+					}
+					.ant-btn:not(.ant-btn-primary):hover {
+						border-color: #1677ff;
+						color: #1677ff;
+					}
+					.ant-btn-primary {
+						box-shadow: 0 6px 16px rgba(22, 119, 255, 0.25);
 					}
 				}
 			}

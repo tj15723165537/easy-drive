@@ -65,14 +65,7 @@ const LoginForm = () => {
         <Input.Password autoComplete="new-password" placeholder="密码：123456" prefix={<LockOutlined />} />
       </Form.Item>
       <Form.Item className="login-btn">
-        <Button
-          onClick={() => {
-            form.resetFields()
-          }}
-          icon={<CloseCircleOutlined />}>
-          {t('login.reset')}
-        </Button>
-        <Button type="primary" className={'ml-4'} htmlType="submit" loading={loading} icon={<UserOutlined />}>
+        <Button type="primary" htmlType="submit" loading={loading} icon={<UserOutlined />}>
           {t('login.confirm')}
         </Button>
       </Form.Item>

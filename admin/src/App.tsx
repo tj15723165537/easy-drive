@@ -40,8 +40,12 @@ const AppContent = () => {
 
   useEffect(() => {
     // 全局使用国际化
-    i18n.changeLanguage(language || getBrowserLang());
-    setLanguage(language || getBrowserLang());
+    const nextLang = language || getBrowserLang();
+    i18n.changeLanguage(nextLang);
+    // 避免重复 set 导致渲染循环
+    if (language !== nextLang) {
+      setLanguage(nextLang);
+    }
     setAntdLanguage();
   }, [language]);
 

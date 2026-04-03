@@ -30,5 +30,5 @@ jwt:
   expiration: 86400000
 
 file:
-  upload-path: ./uploads/
+  upload-path: ./serve/uploads/
   allowed-extensions: jpg,jpeg,png,gif,webp
