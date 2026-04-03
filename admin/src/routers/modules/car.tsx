@@ -19,6 +19,15 @@ const carRouter: Array<RouteObject> = [
           key: 'car',
         },
       },
+      {
+        path: '/car/model',
+        element: lazyLoad(React.lazy(() => import('@/views/car/model'))),
+        meta: {
+          requiresAuth: true,
+          title: '品牌车型管理',
+          key: 'carModel',
+        },
+      },
     ],
   },
 ]

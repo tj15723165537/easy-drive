@@ -1,5 +1,5 @@
 import React, { Ref, useImperativeHandle, useMemo, useState } from 'react'
-import { Form, Input, InputNumber, message, Modal, Select, Spin, Upload } from 'antd'
+import { Form, Input, InputNumber, message, Modal, Select, Spin, Upload, Cascader } from 'antd'
 import { createCar, getCarDetail, updateCar, CarDTO } from '@/api/modules/car'
 import { ModalTitleMap } from '@/const/formModal'
 import { useRequest } from 'ahooks'
@@ -7,6 +7,7 @@ import type { UploadChangeParam } from 'antd/es/upload'
 import type { UploadFile, UploadProps } from 'antd'
 import { PlusOutlined, LoadingOutlined } from '@ant-design/icons'
 import useGlobalStore from '@/store'
+import { getModelTree } from '@/api/modules/carModel'
 
 const { Option } = Select
 
@@ -46,6 +47,50 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
     return actionType === 'view'
   }, [actionType])
   const token: string = useGlobalStore.getState().token
+
+  // 从API获取品牌车型级联选项
+  const { data: treeData } = useRequest(getModelTree, {
+    ready: visible,
+  })
+
+  // 转换为Cascader选项格式
+  const brandOptions = useMemo(() => {
+    if (!treeData?.data) return []
+    return treeData.data.map((item) => ({
+      value: item.value,
+      label: item.label,
+      children: item.children?.map((child) => ({
+        value: child.value,
+        label: child.label,
+      })),
+    }))
+  }, [treeData])
+
+  // 处理级联选择器值变化，同时设置品牌和车型
+  const handleBrandModelChange = (value: string[]) => {
+    if (value && value.length >= 2) {
+      form.setFieldValue('brand', value[0])
+      form.setFieldValue('model', value[1])
+    }
+  }
+
+  // 根据品牌车型值生成级联选择器的值
+  const getBrandModelValue = () => {
+    const brand = form.getFieldValue('brand')
+    const model = form.getFieldValue('model')
+    if (!brand || !model) return undefined
+    // 遍历treeData找到对应的path
+    for (const brandItem of treeData?.data || []) {
+      if (brandItem.value === brand) {
+        for (const child of brandItem.children || []) {
+          if (child.value === model) {
+            return [brand, model]
+          }
+        }
+      }
+    }
+    return undefined
+  }
 
   const { run: getDetail, loading } = useRequest(
     async (id) => {
@@ -166,11 +211,23 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
       width={700}>
       <Spin spinning={loading}>
         <Form form={form} labelCol={{ span: 5 }}>
-          <Form.Item name="brand" label="品牌" rules={[{ required: true, message: '请输入品牌' }]}>
-            <Input placeholder="请输入品牌" disabled={isDisabled} />
-          </Form.Item>
-          <Form.Item name="model" label="车型" rules={[{ required: true, message: '请输入车型' }]}>
-            <Input placeholder="请输入车型" disabled={isDisabled} />
+          <Form.Item label="品牌车型" required rules={[{ validator: (_, value) => {
+            const brand = form.getFieldValue('brand')
+            const model = form.getFieldValue('model')
+            if (!brand || !model) {
+              return Promise.reject(new Error('请选择品牌和车型'))
+            }
+            return Promise.resolve()
+          }}]}>
+            <Cascader
+              options={brandOptions}
+              placeholder="请选择品牌和车型"
+              disabled={isDisabled}
+              onChange={handleBrandModelChange}
+              value={getBrandModelValue()}
+              style={{ width: '100%' }}
+              expandTrigger="hover"
+            />
           </Form.Item>
           <Form.Item name="price" label="价格" rules={[{ required: true, message: '请输入价格' }]}>
             <InputNumber placeholder="请输入价格" style={{ width: '100%' }} min={0} disabled={isDisabled} />

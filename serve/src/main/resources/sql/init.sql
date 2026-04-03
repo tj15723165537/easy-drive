@@ -82,7 +82,45 @@ INSERT INTO `t_menu` (`id`, `parent_id`, `title`, `icon`, `path`, `sort`, `creat
 INSERT INTO `t_menu` (`id`, `parent_id`, `title`, `icon`, `path`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (82, 79, '菜单管理', 'MenuOutlined', '/system/menu', 5, '2026-03-12 09:53:28', '2026-03-12 09:53:28', 0);
 INSERT INTO `t_menu` (`id`, `parent_id`, `title`, `icon`, `path`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (83, 0, '车辆管理', 'CarOutlined', '/car', 6, '2026-03-12 09:53:28', '2026-03-12 09:53:28', 0);
 INSERT INTO `t_menu` (`id`, `parent_id`, `title`, `icon`, `path`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (84, 83, '车辆列表', 'UnorderedListOutlined', '/car/list', 7, '2026-03-12 09:53:28', '2026-03-12 09:53:28', 0);
-INSERT INTO `t_menu` (`id`, `parent_id`, `title`, `icon`, `path`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (85, 83, '车辆发布', 'UploadOutlined', '/car/publish', 8, '2026-03-12 09:53:28', '2026-03-12 09:53:28', 0);
+INSERT INTO `t_menu` (`id`, `parent_id`, `title`, `icon`, `path`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (85, 83, '品牌车型管理', 'CarOutlined', '/car/model', 8, '2026-03-12 09:53:28', '2026-03-12 09:53:28', 0);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for t_car_brand
+-- ----------------------------
+DROP TABLE IF EXISTS `t_car_brand`;
+CREATE TABLE `t_car_brand` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '品牌ID',
+  `name` varchar(50) NOT NULL COMMENT '品牌名称',
+  `initial` varchar(1) DEFAULT NULL COMMENT '首字母 A-Z',
+  `sort` int DEFAULT '0',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `deleted` int DEFAULT '0' COMMENT '逻辑删除：0-未删除，1-已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='品牌表';
+
+-- ----------------------------
+-- Table structure for t_car_model
+-- ----------------------------
+DROP TABLE IF EXISTS `t_car_model`;
+CREATE TABLE `t_car_model` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '车型ID',
+  `brand_id` bigint NOT NULL COMMENT '所属品牌ID',
+  `name` varchar(50) NOT NULL COMMENT '车型名称',
+  `sort` int DEFAULT '0',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `deleted` int DEFAULT '0' COMMENT '逻辑删除：0-未删除，1-已删除',
+  PRIMARY KEY (`id`),
+  KEY `idx_brand_id` (`brand_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='车型表';
+
+-- ----------------------------
+-- Records of t_role_menu for new menu
+-- ----------------------------
+BEGIN;
+INSERT INTO `t_role_menu` (`role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (1, 85, NOW(), NOW(), 0);
 COMMIT;
 
 -- ----------------------------
@@ -136,10 +174,8 @@ INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_ti
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (559, 1, 81, '2026-03-12 10:18:58', '2026-03-12 10:18:58', 0);
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (560, 1, 82, '2026-03-12 10:18:58', '2026-03-12 10:18:58', 0);
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (561, 1, 84, '2026-03-12 10:18:58', '2026-03-12 10:18:58', 0);
-INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (562, 1, 85, '2026-03-12 10:18:58', '2026-03-12 10:18:58', 0);
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (565, 2, 83, '2026-03-12 10:19:09', '2026-03-12 10:19:09', 0);
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (566, 2, 84, '2026-03-12 10:19:09', '2026-03-12 10:19:09', 0);
-INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (567, 2, 85, '2026-03-12 10:19:09', '2026-03-12 10:19:09', 0);
 COMMIT;
 
 -- ----------------------------
