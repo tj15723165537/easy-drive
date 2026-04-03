@@ -28,12 +28,11 @@ CREATE TABLE `t_car` (
   `price` decimal(10,2) DEFAULT NULL COMMENT '价格',
   `mileage` int DEFAULT NULL COMMENT '里程数(公里)',
   `year` int DEFAULT NULL COMMENT '年份',
-  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '颜色',
   `fuel_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '燃料类型',
   `transmission` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '变速箱',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '描述',
   `images` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '图片URL(逗号分隔)',
-  `location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '位置',
+  `pickup_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '提车地址',
   `status` int DEFAULT '1' COMMENT '状态：1-在售，0-已售',
   `user_id` bigint DEFAULT NULL COMMENT '发布用户ID',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
@@ -51,7 +50,7 @@ CREATE TABLE `t_car` (
 -- Records of t_car
 -- ----------------------------
 BEGIN;
-INSERT INTO `t_car` (`id`, `brand`, `model`, `price`, `mileage`, `year`, `color`, `fuel_type`, `transmission`, `description`, `images`, `location`, `status`, `user_id`, `create_time`, `update_time`, `deleted`) VALUES (25, '小米', 'su7', 230000.00, 12000, 2026, '海湾蓝', '电动', '自动', '99新', '/uploads/22223eef-704d-4611-8338-f1d8e07399a0.jpg,/uploads/5787e867-c291-4d61-93a7-7a8866a83fa7.jpg', '北京市朝阳区', 1, 11, '2026-03-13 14:21:04', '2026-03-13 16:39:46', 0);
+INSERT INTO `t_car` (`id`, `brand`, `model`, `price`, `mileage`, `year`, `fuel_type`, `transmission`, `description`, `images`, `pickup_location`, `status`, `user_id`, `create_time`, `update_time`, `deleted`) VALUES (25, '小米', 'su7', 230000.00, 12000, 2026, '电动', '自动', '99新', '/uploads/22223eef-704d-4611-8338-f1d8e07399a0.jpg,/uploads/5787e867-c291-4d61-93a7-7a8866a83fa7.jpg', '北京市朝阳区', 1, 11, '2026-03-13 14:21:04', '2026-03-13 16:39:46', 0);
 COMMIT;
 
 -- ----------------------------

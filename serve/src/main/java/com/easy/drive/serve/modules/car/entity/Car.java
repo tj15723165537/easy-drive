@@ -16,12 +16,11 @@ public class Car extends BaseEntity {
     private BigDecimal price;
     private Integer mileage;
     private Integer year;
-    private String color;
     private String fuelType;
     private String transmission;
     private String description;
     private String images;
-    private String location;
+    private String pickupLocation;
     private Integer status;
     private Long userId;
 }

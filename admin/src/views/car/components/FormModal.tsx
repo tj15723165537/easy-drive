@@ -1,5 +1,5 @@
 import React, { Ref, useImperativeHandle, useMemo, useState } from 'react'
-import { Form, Input, InputNumber, message, Modal, Select, Spin, Upload, Cascader } from 'antd'
+import { Form, Input, InputNumber, message, Modal, Select, Spin, Upload, Row, Col } from 'antd'
 import { createCar, getCarDetail, updateCar, CarDTO } from '@/api/modules/car'
 import { ModalTitleMap } from '@/const/formModal'
 import { useRequest } from 'ahooks'
@@ -43,6 +43,7 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
   const [id, setId] = useState<number>()
   const [uploading, setUploading] = useState(false)
   const [imageUrls, setImageUrls] = useState<string[]>([])
+  const [selectedBrand, setSelectedBrand] = useState<string>()
   const isDisabled = useMemo(() => {
     return actionType === 'view'
   }, [actionType])
@@ -53,7 +54,7 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
     ready: visible,
   })
 
-  // 转换为Cascader选项格式
+  // 转换为品牌选项格式
   const brandOptions = useMemo(() => {
     if (!treeData?.data) return []
     return treeData.data.map((item) => ({
@@ -66,30 +67,23 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
     }))
   }, [treeData])
 
-  // 处理级联选择器值变化，同时设置品牌和车型
-  const handleBrandModelChange = (value: string[]) => {
-    if (value && value.length >= 2) {
-      form.setFieldValue('brand', value[0])
-      form.setFieldValue('model', value[1])
-    }
+  // 当前选中品牌的车型列表
+  const modelOptions = useMemo(() => {
+    if (!selectedBrand || !treeData?.data) return []
+    const brandItem = treeData.data.find((item) => item.value === selectedBrand)
+    return brandItem?.children || []
+  }, [selectedBrand, treeData])
+
+  // 品牌选择变化
+  const handleBrandChange = (value: string) => {
+    setSelectedBrand(value)
+    form.setFieldValue('brand', value)
+    form.setFieldValue('model', undefined)
   }
 
-  // 根据品牌车型值生成级联选择器的值
-  const getBrandModelValue = () => {
-    const brand = form.getFieldValue('brand')
-    const model = form.getFieldValue('model')
-    if (!brand || !model) return undefined
-    // 遍历treeData找到对应的path
-    for (const brandItem of treeData?.data || []) {
-      if (brandItem.value === brand) {
-        for (const child of brandItem.children || []) {
-          if (child.value === model) {
-            return [brand, model]
-          }
-        }
-      }
-    }
-    return undefined
+  // 车型选择变化
+  const handleModelChange = (value: string) => {
+    form.setFieldValue('model', value)
   }
 
   const { run: getDetail, loading } = useRequest(
@@ -97,6 +91,9 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
       const result = await getCarDetail(id!)
       if (result.data) {
         form.setFieldsValue({ ...result.data })
+        if (result.data.brand) {
+          setSelectedBrand(result.data.brand)
+        }
         if (result.data.imageList) {
           setImageUrls(result.data.imageList.map(getFullImageUrl))
         }
@@ -111,6 +108,7 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
     if (type === 'add') {
       form.resetFields()
       setId(undefined)
+      setSelectedBrand(undefined)
       form.setFieldValue('year', new Date().getFullYear())
       form.setFieldValue('status', 1) // 默认已上线
       setImageUrls([])
@@ -126,9 +124,9 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
         await createCar(data)
       } else {
         await updateCar({
-					...data,
-					id
-				})
+          ...data,
+          id,
+        })
       }
     },
     {
@@ -208,27 +206,52 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
       onCancel={() => {
         setVisible(false)
       }}
-      width={700}>
+      width={700}
+    >
       <Spin spinning={loading}>
         <Form form={form} labelCol={{ span: 5 }}>
-          <Form.Item label="品牌车型" required rules={[{ validator: (_, value) => {
-            const brand = form.getFieldValue('brand')
-            const model = form.getFieldValue('model')
-            if (!brand || !model) {
-              return Promise.reject(new Error('请选择品牌和车型'))
-            }
-            return Promise.resolve()
-          }}]}>
-            <Cascader
-              options={brandOptions}
-              placeholder="请选择品牌和车型"
-              disabled={isDisabled}
-              onChange={handleBrandModelChange}
-              value={getBrandModelValue()}
-              style={{ width: '100%' }}
-              expandTrigger="hover"
-            />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item name="brand" label="品牌" rules={[{ required: true, message: '请选择品牌' }]}>
+                <Select
+                  placeholder="请选择品牌"
+                  disabled={isDisabled}
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  onChange={handleBrandChange}
+                >
+                  {brandOptions.map((item) => (
+                    <Option key={item.value} value={item.value} label={item.label}>
+                      {item.label}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item name="model" label="车型" rules={[{ required: true, message: '请选择车型' }]}>
+                <Select
+                  placeholder={selectedBrand ? '请选择车型' : '请先选择品牌'}
+                  disabled={isDisabled || !selectedBrand}
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  onChange={handleModelChange}
+                >
+                  {modelOptions.map((item) => (
+                    <Option key={item.value} value={item.value} label={item.label}>
+                      {item.label}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="price" label="价格" rules={[{ required: true, message: '请输入价格' }]}>
             <InputNumber placeholder="请输入价格" style={{ width: '100%' }} min={0} disabled={isDisabled} />
           </Form.Item>
@@ -243,9 +266,6 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
               max={2030}
               disabled={isDisabled}
             />
-          </Form.Item>
-          <Form.Item name="color" label="颜色">
-            <Input placeholder="请输入颜色" disabled={isDisabled} />
           </Form.Item>
           <Form.Item name="fuelType" label="燃料类型">
             <Select placeholder="请选择燃料类型" style={{ width: '100%' }} disabled={isDisabled} allowClear>
@@ -265,8 +285,8 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="location" label="车辆地址" rules={[{ required: true, message: '请输入车辆地址' }]}>
-            <Input placeholder="请输入车辆地址" disabled={isDisabled} />
+          <Form.Item name="pickupLocation" label="提车地址" rules={[{ required: true, message: '请输入提车地址' }]}>
+            <Input placeholder="请输入提车地址" disabled={isDisabled} />
           </Form.Item>
           <Form.Item name="status" label="状态">
             <Select placeholder="请选择状态" style={{ width: '100%' }} disabled={isDisabled}>
@@ -287,7 +307,8 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
                 }}
                 beforeUpload={beforeUpload}
                 onChange={handleChange}
-                disabled={isDisabled}>
+                disabled={isDisabled}
+              >
                 {uploadButton}
               </Upload>
             </div>
@@ -323,7 +344,8 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
                         justifyContent: 'center',
                         fontSize: 12,
                       }}
-                      onClick={() => handleRemove(url)}>
+                      onClick={() => handleRemove(url)}
+                    >
                       ×
                     </span>
                   )}

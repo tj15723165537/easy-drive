@@ -24,9 +24,6 @@ public class CarUpdateDTO {
     @Schema(description = "年份", example = "2020")
     private Integer year;
 
-    @Schema(description = "颜色", example = "白色")
-    private String color;
-
     @Schema(description = "燃料类型", example = "汽油", allowableValues = {"汽油", "柴油", "电动", "混动"})
     private String fuelType;
 
@@ -39,8 +36,8 @@ public class CarUpdateDTO {
     @Schema(description = "图片URL(逗号分隔)", example = "/uploads/image1.jpg,/uploads/image2.jpg")
     private String images;
 
-    @Schema(description = "位置", example = "北京市朝阳区")
-    private String location;
+    @Schema(description = "提车地址", example = "北京市朝阳区")
+    private String pickupLocation;
 
     @Schema(description = "状态：1-已上线，0-已下线", example = "1")
     private Integer status;

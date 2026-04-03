@@ -667,6 +667,10 @@ INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_ti
 INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (33, '秦Pro DM', 41, NOW(), NOW(), 0);
 INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (33, '秦Pro EV', 42, NOW(), NOW(), 0);
 INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (33, '速锐', 43, NOW(), NOW(), 0);
+INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (33, '秦L', 44, NOW(), NOW(), 0);
+INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (33, '汉DM', 45, NOW(), NOW(), 0);
+INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (33, '汉EV', 46, NOW(), NOW(), 0);
+INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (33, '汉L', 47, NOW(), NOW(), 0);
 INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (34, 'M3', 1, NOW(), NOW(), 0);
 INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (34, 'T3', 2, NOW(), NOW(), 0);
 INSERT INTO `t_car_model` (`brand_id`, `name`, `sort`, `create_time`, `update_time`, `deleted`) VALUES (34, 'T5', 3, NOW(), NOW(), 0);

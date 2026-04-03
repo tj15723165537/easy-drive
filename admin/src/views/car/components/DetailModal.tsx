@@ -112,12 +112,11 @@ const DetailModal = ({ visible, onClose, carData }: Props) => {
             <Descriptions.Item label="品牌">{carData.brand}</Descriptions.Item>
             <Descriptions.Item label="车型">{carData.model}</Descriptions.Item>
             <Descriptions.Item label="年份">{carData.year}年</Descriptions.Item>
-            <Descriptions.Item label="颜色">{carData.color || '-'}</Descriptions.Item>
             <Descriptions.Item label="里程数">{carData.mileage?.toLocaleString()}公里</Descriptions.Item>
             <Descriptions.Item label="燃料类型">{carData.fuelType || '-'}</Descriptions.Item>
             <Descriptions.Item label="变速箱">{carData.transmission || '-'}</Descriptions.Item>
             <Descriptions.Item label="状态">{statusTag}</Descriptions.Item>
-            <Descriptions.Item label="车辆地址" span={2}>{carData.location}</Descriptions.Item>
+            <Descriptions.Item label="提车地址" span={2}>{carData.pickupLocation}</Descriptions.Item>
             <Descriptions.Item label="发布者">{carData.username}</Descriptions.Item>
             <Descriptions.Item label="创建时间">
               {carData.createTime ? moment(carData.createTime).format('YYYY-MM-DD HH:mm:ss') : '-'}

@@ -53,10 +53,9 @@ const CarPagePage = () => {
       render: (mileage) => `${mileage.toLocaleString()}公里`,
     },
     { title: '年份', dataIndex: 'year', align: 'center', width: 100 },
-    { title: '颜色', dataIndex: 'color', align: 'center', width: 100 },
     { title: '燃料类型', dataIndex: 'fuelType', align: 'center', width: 100 },
     { title: '变速箱', dataIndex: 'transmission', align: 'center', width: 100 },
-    { title: '车辆地址', dataIndex: 'location', align: 'center', width: 200 },
+    { title: '提车地址', dataIndex: 'pickupLocation', align: 'center', width: 200 },
     {
       title: '状态',
       dataIndex: 'status',

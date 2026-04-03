@@ -29,9 +29,6 @@ public class CarInfoVO {
     @Schema(description = "年份", example = "2020")
     private Integer year;
 
-    @Schema(description = "颜色", example = "白色")
-    private String color;
-
     @Schema(description = "燃料类型", example = "汽油")
     private String fuelType;
 
@@ -44,8 +41,8 @@ public class CarInfoVO {
     @Schema(description = "图片URL列表")
     private java.util.List<String> imageList;
 
-    @Schema(description = "车辆地址", example = "北京市朝阳区")
-    private String location;
+    @Schema(description = "提车地址", example = "北京市朝阳区")
+    private String pickupLocation;
 
     @Schema(description = "状态：1-已上线，0-已下下线", example = "1")
     private Integer status;

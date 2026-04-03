@@ -8,12 +8,11 @@ export interface CarVO {
   price: number
   mileage: number
   year: number
-  color: string
   fuelType: string
   transmission: string
   description: string
   imageList: string[]
-  location: string
+  pickupLocation: string
   status: number
   userId: number
   username: string
@@ -28,12 +27,11 @@ export interface CarDTO {
   price?: number
   mileage?: number
   year?: number
-  color?: string
   fuelType?: string
   transmission?: string
   description?: string
   images?: string
-  location?: string
+  pickupLocation?: string
   status?: number
 }
 

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useMemo } from 'react'
-import { Table, Button, Space, message, Popconfirm, Input } from 'antd'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
+import { Table, Button, Space, message, Popconfirm, Input, Card, Row, Col, Empty, Spin } from 'antd'
 import { PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
 import { ColumnsType } from 'antd/es/table'
 import { useRequest } from 'ahooks'
@@ -13,13 +13,17 @@ import {
   CarModelVO,
 } from '@/api/modules/carModel'
 
+const ALPHABETS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+
 const CarModelPage: React.FC = () => {
-  const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([])
+  const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null)
   const [searchText, setSearchText] = useState('')
+  const [selectedInitial, setSelectedInitial] = useState<string | null>(null)
   const formModalRef = useRef<any>(null)
 
-  const { data: brandData, loading, refresh } = useRequest(getBrandList)
-  const { run: fetchModels } = useRequest(
+  const { data: brandData, loading: brandLoading, refresh } = useRequest(getBrandList)
+
+  const { data: modelData, loading: modelLoading, run: fetchModels } = useRequest(
     (brandId: number) => getModelList(brandId),
     { manual: true }
   )
@@ -27,29 +31,35 @@ const CarModelPage: React.FC = () => {
   // 品牌列表
   const brandList = useMemo(() => brandData?.data || [], [brandData])
 
-  // 根据品牌ID获取车型列表（从展开的行中获取）
-  const [modelData, setModelData] = useState<Record<number, CarModelVO[]>>({})
+  // 车型列表
+  const modelList = useMemo(() => modelData?.data || [], [modelData])
 
-  // 过滤品牌
+  // 过滤品牌（按搜索和首字母）
   const filteredBrandList = useMemo(() => {
-    if (!searchText) return brandList
-    return brandList.filter((brand) =>
-      brand.name.toLowerCase().includes(searchText.toLowerCase())
-    )
-  }, [brandList, searchText])
-
-  // 展开品牌行
-  const handleExpand = async (expanded: boolean, record: CarBrandVO) => {
-    const keys = expanded
-      ? [...expandedRowKeys, String(record.id)]
-      : expandedRowKeys.filter((k) => k !== String(record.id))
-    setExpandedRowKeys(keys)
-
-    if (expanded && !modelData[record.id]) {
-      const res = await getModelList(record.id)
-      setModelData((prev) => ({ ...prev, [record.id]: res?.data || [] }))
+    let list = brandList
+    if (selectedInitial) {
+      list = list.filter((brand) => brand.initial === selectedInitial)
     }
-  }
+    if (searchText) {
+      list = list.filter((brand) =>
+        brand.name.toLowerCase().includes(searchText.toLowerCase())
+      )
+    }
+    return list
+  }, [brandList, searchText, selectedInitial])
+
+  // 选中的品牌
+  const selectedBrand = useMemo(
+    () => brandList.find((b) => b.id === selectedBrandId),
+    [brandList, selectedBrandId]
+  )
+
+  // 监听选中品牌变化，获取车型列表
+  useEffect(() => {
+    if (selectedBrandId) {
+      fetchModels(selectedBrandId)
+    }
+  }, [selectedBrandId])
 
   // 品牌列
   const brandColumns: ColumnsType<CarBrandVO> = [
@@ -62,13 +72,13 @@ const CarModelPage: React.FC = () => {
       title: '首字母',
       dataIndex: 'initial',
       key: 'initial',
-      width: 100,
+      width: 80,
     },
     {
       title: '排序',
       dataIndex: 'sort',
       key: 'sort',
-      width: 80,
+      width: 60,
     },
     {
       title: '操作',
@@ -79,35 +89,41 @@ const CarModelPage: React.FC = () => {
           <Button
             type="link"
             size="small"
-            icon={<PlusOutlined />}
-            onClick={() => formModalRef.current?.showModelModal('add', record.id)}
-          >
-            新增车型
-          </Button>
-          <Button
-            type="link"
-            size="small"
             icon={<EditOutlined />}
-            onClick={() => formModalRef.current?.showBrandModal('edit', record.id)}
+            onClick={(e) => {
+              e.stopPropagation()
+              formModalRef.current?.showBrandModal('edit', record.id)
+            }}
           >
             编辑
           </Button>
           <Popconfirm
             title="确定删除该品牌？"
             description="删除品牌将同时删除其下属所有车型"
-            onConfirm={async () => {
+            onConfirm={async (e) => {
+              e?.stopPropagation()
               try {
                 await deleteBrand(record.id)
                 message.success('删除成功')
+                if (selectedBrandId === record.id) {
+                  setSelectedBrandId(null)
+                }
                 refresh()
               } catch {
                 message.error('删除失败')
               }
             }}
+            onCancel={(e) => e?.stopPropagation()}
             okText="确定"
             cancelText="取消"
           >
-            <Button type="link" size="small" danger icon={<DeleteOutlined />}>
+            <Button
+              type="link"
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={(e) => e.stopPropagation()}
+            >
               删除
             </Button>
           </Popconfirm>
@@ -149,9 +165,7 @@ const CarModelPage: React.FC = () => {
               try {
                 await deleteModel(record.id)
                 message.success('删除成功')
-                // 刷新车型列表
-                const res = await getModelList(record.brandId)
-                setModelData((prev) => ({ ...prev, [record.brandId]: res?.data || [] }))
+                fetchModels(record.brandId)
               } catch {
                 message.error('删除失败')
               }
@@ -168,63 +182,113 @@ const CarModelPage: React.FC = () => {
     },
   ]
 
-  // 车型表格行
-  const expandedRowRender = (record: CarBrandVO) => {
-    const models = modelData[record.id] || []
-
-    return (
-      <div style={{ padding: '8px 0' }}>
-        <Table
-          rowKey="id"
-          size="small"
-          pagination={false}
-          columns={modelColumns}
-          dataSource={models}
-          locale={{ emptyText: '暂无车型，请点击新增车型添加' }}
-        />
-      </div>
-    )
-  }
-
   return (
-    <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-        <Input
-          placeholder="搜索品牌"
-          prefix={<SearchOutlined />}
-          style={{ width: 200 }}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          allowClear
-        />
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => formModalRef.current?.showBrandModal('add')}>
-          新增品牌
-        </Button>
-      </div>
+    <Row gutter={16}>
+      {/* 左侧品牌列表 */}
+      <Col span={10}>
+        <Card
+          title="品牌列表"
+          extra={
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => formModalRef.current?.showBrandModal('add')}>
+              新增品牌
+            </Button>
+          }
+          className="h-full"
+          styles={{ body: { height: 'calc(100vh - 180px)', overflow: 'auto' } }}
+        >
+          <div style={{ marginBottom: 12 }}>
+            <Input
+              placeholder="搜索品牌"
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+            />
+          </div>
+          {/* 字母筛选 */}
+          <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            <Button
+              type={selectedInitial === null ? 'primary' : 'default'}
+              size="small"
+              onClick={() => setSelectedInitial(null)}
+            >
+              全部
+            </Button>
+            {ALPHABETS.map((letter) => (
+              <Button
+                key={letter}
+                type={selectedInitial === letter ? 'primary' : 'default'}
+                size="small"
+                onClick={() => setSelectedInitial(letter)}
+                style={{ width: 28, padding: '0 4px' }}
+              >
+                {letter}
+              </Button>
+            ))}
+          </div>
+          <Table
+            rowKey="id"
+            loading={brandLoading}
+            columns={brandColumns}
+            dataSource={filteredBrandList}
+            pagination={false}
+            size="small"
+            rowClassName={(record) => (selectedBrandId === record.id ? 'ant-table-row-selected' : '')}
+            onRow={(record) => ({
+              onClick: () => setSelectedBrandId(record.id),
+              style: { cursor: 'pointer' },
+            })}
+            locale={{ emptyText: '暂无品牌，请点击右上角新增' }}
+          />
+        </Card>
+      </Col>
 
-      <Table
-        rowKey="id"
-        loading={loading}
-        columns={brandColumns}
-        dataSource={filteredBrandList}
-        expandable={{
-          expandedRowKeys,
-          expandedRowRender,
-          onExpand: handleExpand,
-          expandRowByClick: true,
-        }}
-        pagination={false}
-      />
+      {/* 右侧车型列表 */}
+      <Col span={14}>
+        <Card
+          title={selectedBrand ? `${selectedBrand.name} - 车型列表` : '车型列表'}
+          extra={
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              disabled={!selectedBrandId}
+              onClick={() => formModalRef.current?.showModelModal('add', selectedBrandId!)}
+            >
+              新增车型
+            </Button>
+          }
+          className="h-full"
+          styles={{ body: { height: 'calc(100vh - 180px)', overflow: 'auto' } }}
+        >
+          {!selectedBrandId ? (
+            <Empty description="请先选择左侧品牌" style={{ marginTop: 100 }} />
+          ) : modelLoading ? (
+            <div style={{ textAlign: 'center', padding: 60 }}>
+              <Spin size="large" />
+              <div style={{ marginTop: 16 }}>加载中...</div>
+            </div>
+          ) : (
+            <Table
+              rowKey="id"
+              loading={modelLoading}
+              columns={modelColumns}
+              dataSource={modelList}
+              pagination={false}
+              size="small"
+              locale={{ emptyText: '暂无车型，请点击右上角新增' }}
+            />
+          )}
+        </Card>
+      </Col>
 
       <FormModal
         ref={formModalRef}
         onRefresh={refresh}
-        onModelRefresh={async (brandId) => {
-          const res = await getModelList(brandId)
-          setModelData((prev) => ({ ...prev, [brandId]: res?.data || [] }))
+        onModelRefresh={(brandId) => {
+          fetchModels(brandId)
         }}
       />
-    </div>
+    </Row>
   )
 }
 

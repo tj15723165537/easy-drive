@@ -44,6 +44,7 @@ const FormModal = forwardRef<FormModalRef, Props>(({ onRefresh, onModelRefresh }
   const showBrandModal = async (type: 'add' | 'edit', id?: number) => {
     setActionType('brand')
     setEditType(type)
+    setModelId(id)
     setVisible(true)
     if (type === 'add') {
       form.resetFields()
@@ -56,6 +57,8 @@ const FormModal = forwardRef<FormModalRef, Props>(({ onRefresh, onModelRefresh }
   const showModelModal = async (type: 'add' | 'edit', brandId?: number, id?: number) => {
     setActionType('model')
     setEditType(type)
+    setModelId(id)
+    setBrandId(brandId)
     setVisible(true)
 
     // 获取品牌列表
@@ -74,6 +77,7 @@ const FormModal = forwardRef<FormModalRef, Props>(({ onRefresh, onModelRefresh }
           ...result.data,
           brandId: result.data.brandId,
         })
+        setBrandId(result.data.brandId)
       }
     }
   }
@@ -88,11 +92,14 @@ const FormModal = forwardRef<FormModalRef, Props>(({ onRefresh, onModelRefresh }
           await updateBrand(modelId!, values as CarBrandDTO)
         }
       } else {
+        const currentBrandId = values.brandId as number
         if (editType === 'add') {
           await createModel(values as CarModelDTO)
         } else {
           await updateModel(modelId!, values as CarModelDTO)
         }
+        // 刷新车型列表
+        onModelRefresh(currentBrandId)
       }
     },
     {
@@ -101,9 +108,6 @@ const FormModal = forwardRef<FormModalRef, Props>(({ onRefresh, onModelRefresh }
         message.success('操作成功')
         setVisible(false)
         onRefresh()
-        if (actionType === 'model' && brandId) {
-          onModelRefresh(brandId)
-        }
       },
     }
   )
