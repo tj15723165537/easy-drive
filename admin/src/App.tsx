@@ -6,6 +6,7 @@ import AuthRouter from '@/routers/utils/authRouter';
 import Router from '@/routers/index';
 import useTheme from '@/hooks/useTheme';
 import useGlobalStore from '@/store';
+import useMenuStore from '@/store/menu';
 import zhCN from 'antd/lib/locale/zh_CN';
 import enUS from 'antd/lib/locale/en_US';
 import i18n from 'i18next';
@@ -14,10 +15,16 @@ import {
   defaultTheme, // 默认主题
   darkTheme, // 暗色主题
 } from '@ant-design/compatible';
+import { getMenuList } from '@/api/modules/login';
+import { handleRouter } from '@/utils/util';
+import useAuthStore from '@/store/auth';
 
-const App = () => {
-  const { language, assemblySize, themeConfig, setLanguage } = useGlobalStore();
+const AppContent = () => {
+  const { language, assemblySize, themeConfig, setLanguage, token } = useGlobalStore();
+  const setMenuListAction = useMenuStore((s) => s.setMenuList);
+  const setAuthRouter = useAuthStore((s) => s.setAuthRouter);
   const [i18nLocale, setI18nLocale] = useState(zhCN);
+  const [menuLoaded, setMenuLoaded] = useState(false);
 
   // 全局使用主题
   useTheme(themeConfig);
@@ -38,16 +45,67 @@ const App = () => {
     setAntdLanguage();
   }, [language]);
 
+  // 初始化加载菜单
+  useEffect(() => {
+    const loadMenu = async () => {
+      if (!token) {
+        setMenuLoaded(true);
+        return;
+      }
+      try {
+        const { data } = await getMenuList();
+        if (data) {
+          // 检查是否包含首页菜单
+          const hasHome = data.some((menu: any) => menu.path === '/home');
+          let finalMenus = data;
+          if (!hasHome) {
+            finalMenus = [
+              { path: '/home', title: '首页', icon: 'HomeOutlined', children: [] },
+              ...data,
+            ];
+          }
+          setMenuListAction(finalMenus);
+          // 处理路由权限
+          const dynamicRouter = handleRouter(finalMenus);
+          setAuthRouter(dynamicRouter);
+        }
+      } finally {
+        setMenuLoaded(true);
+      }
+    };
+    loadMenu();
+  }, [token]);
+
+  if (!menuLoaded) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+        }}>
+        加载中...
+      </div>
+    );
+  }
+
+  return (
+    <ConfigProvider
+      locale={i18nLocale}
+      componentSize={assemblySize}
+      theme={themeConfig.isDark ? darkTheme : defaultTheme}>
+      <AuthRouter>
+        <Router />
+      </AuthRouter>
+    </ConfigProvider>
+  );
+};
+
+const App = () => {
   return (
     <HashRouter>
-      <ConfigProvider
-        locale={i18nLocale}
-        componentSize={assemblySize}
-        theme={themeConfig.isDark ? darkTheme : defaultTheme}>
-        <AuthRouter>
-          <Router />
-        </AuthRouter>
-      </ConfigProvider>
+      <AppContent />
     </HashRouter>
   );
 };

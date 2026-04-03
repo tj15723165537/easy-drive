@@ -1,4 +1,4 @@
-import React, { Ref, useImperativeHandle, useState } from 'react'
+import React, { Ref, useImperativeHandle, useState, forwardRef } from 'react'
 import { Form, Input, InputNumber, Modal, Select, message } from 'antd'
 import { useRequest } from 'ahooks'
 import {
@@ -27,7 +27,7 @@ export interface FormModalRef {
 
 const INITIALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
-const FormModal: React.FC<Props> = ({ onRefresh, onModelRefresh }, ref: Ref<FormModalRef>) => {
+const FormModal = forwardRef<FormModalRef, Props>(({ onRefresh, onModelRefresh }, ref) => {
   const [form] = Form.useForm()
   const [visible, setVisible] = useState(false)
   const [actionType, setActionType] = useState<'brand' | 'model'>('brand')
@@ -69,10 +69,12 @@ const FormModal: React.FC<Props> = ({ onRefresh, onModelRefresh }, ref: Ref<Form
       }
     } else {
       const result = await getModelDetail(id!)
-      form.setFieldsValue({
-        ...result.data,
-        brandId: result.data.brandId,
-      })
+      if (result?.data) {
+        form.setFieldsValue({
+          ...result.data,
+          brandId: result.data.brandId,
+        })
+      }
     }
   }
 
@@ -165,6 +167,8 @@ const FormModal: React.FC<Props> = ({ onRefresh, onModelRefresh }, ref: Ref<Form
       </Form>
     </Modal>
   )
-}
+})
+
+FormModal.displayName = 'FormModal'
 
 export default FormModal

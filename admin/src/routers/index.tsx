@@ -1,41 +1,34 @@
 import { Navigate, useRoutes } from 'react-router-dom'
-import { RouteObject } from '@/routers/interface'
 import Login from '@/views/login/index'
-
-// * 导入所有router
-const metaRouters = import.meta.globEager('./modules/*.tsx')
-
-// * 处理路由
-export const routerArray: RouteObject[] = []
-Object.keys(metaRouters).forEach((item) => {
-  Object.keys(metaRouters[item]).forEach((key: any) => {
-    routerArray.push(...metaRouters[item][key])
-  })
-})
-console.log(routerArray)
-export const rootRouter: RouteObject[] = [
-  {
-    path: '/',
-    element: <Navigate to="/login" />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-    meta: {
-      requiresAuth: false,
-      title: '登录页',
-      key: 'login',
-    },
-  },
-  ...routerArray,
-  {
-    path: '*',
-    element: <Navigate to="/404" />,
-  },
-]
+import useMenuStore from '@/store/menu'
+import { generateDynamicRoutes } from '@/routers/routeModules'
+import { HOME_URL } from '@/config/config'
 
 const Router = () => {
-  const routes = useRoutes(rootRouter as any[])
+  const menuList = useMenuStore((s) => s.menuList)
+  const dynamicRoutes = menuList.length > 0 ? generateDynamicRoutes(menuList) : []
+
+  const staticRoutes = [
+    {
+      path: '/',
+      element: <Navigate to={HOME_URL} />,
+    },
+    {
+      path: '/login',
+      element: <Login />,
+      meta: {
+        requiresAuth: false,
+        title: '登录页',
+        key: 'login',
+      },
+    },
+    {
+      path: '*',
+      element: <Navigate to="/404" />,
+    },
+  ]
+
+  const routes = useRoutes([...staticRoutes, ...dynamicRoutes] as any)
   return routes
 }
 

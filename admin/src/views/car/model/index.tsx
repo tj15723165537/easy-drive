@@ -46,8 +46,8 @@ const CarModelPage: React.FC = () => {
     setExpandedRowKeys(keys)
 
     if (expanded && !modelData[record.id]) {
-      const result = await fetchModels(record.id)
-      setModelData((prev) => ({ ...prev, [record.id]: result?.data || [] }))
+      const res = await getModelList(record.id)
+      setModelData((prev) => ({ ...prev, [record.id]: res?.data || [] }))
     }
   }
 
@@ -150,8 +150,8 @@ const CarModelPage: React.FC = () => {
                 await deleteModel(record.id)
                 message.success('删除成功')
                 // 刷新车型列表
-                const result = await fetchModels(record.brandId)
-                setModelData((prev) => ({ ...prev, [record.brandId]: result?.data || [] }))
+                const res = await getModelList(record.brandId)
+                setModelData((prev) => ({ ...prev, [record.brandId]: res?.data || [] }))
               } catch {
                 message.error('删除失败')
               }
@@ -219,10 +219,9 @@ const CarModelPage: React.FC = () => {
       <FormModal
         ref={formModalRef}
         onRefresh={refresh}
-        onModelRefresh={(brandId) => {
-          fetchModels(brandId).then((res) => {
-            setModelData((prev) => ({ ...prev, [brandId]: res?.data || [] }))
-          })
+        onModelRefresh={async (brandId) => {
+          const res = await getModelList(brandId)
+          setModelData((prev) => ({ ...prev, [brandId]: res?.data || [] }))
         }}
       />
     </div>

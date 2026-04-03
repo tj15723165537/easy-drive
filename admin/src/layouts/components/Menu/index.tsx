@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Menu, Spin } from 'antd'
-import { findAllBreadcrumb, getOpenKeys, handleRouter, searchRoute } from '@/utils/util'
+import { findAllBreadcrumb, getOpenKeys, searchRoute } from '@/utils/util'
 import useMenuStore from '@/store/menu'
 import useBreadcrumbStore from '@/store/breadcrumb'
-import useAuthStore from '@/store/auth'
-import { getMenuList } from '@/api/modules/login'
 import type { MenuProps } from 'antd'
 import * as Icons from '@ant-design/icons'
 import Logo from './components/Logo'
@@ -14,9 +12,8 @@ import './index.less'
 const LayoutMenu = () => {
   const { pathname } = useLocation()
   const isCollapse = useMenuStore((s) => s.isCollapse)
-  const setMenuListAction = useMenuStore((s) => s.setMenuList)
+  const menuList = useMenuStore((s) => s.menuList)
   const setBreadcrumbList = useBreadcrumbStore((s) => s.setBreadcrumbList)
-  const setAuthRouter = useAuthStore((s) => s.setAuthRouter)
   const [selectedKeys, setSelectedKeys] = useState<string[]>([pathname])
   const [openKeys, setOpenKeys] = useState<string[]>([])
 
@@ -68,77 +65,43 @@ const LayoutMenu = () => {
     return newArr
   }
 
-  // 获取菜单列表并处理成 antd menu 需要的格式
-  const [menuList, setMenuList] = useState<MenuItem[]>([])
-  const [loading, setLoading] = useState(false)
-  const getMenuData = async () => {
-    setLoading(true)
-    try {
-      const { data } = await getMenuList()
-      if (!data) return
-
-      // 检查是否包含首页菜单
-      const hasHome = data.some((menu) => menu.path === '/home')
-
-      // 如果没有首页，添加默认首页菜单
-      let finalMenus = data
-      if (!hasHome) {
-        const homeMenu: Menu.MenuOptions = {
-          path: '/home',
-          title: '首页',
-          icon: 'HomeOutlined',
-          children: [],
-        }
-        // 添加到最前面
-        finalMenus = [homeMenu, ...data]
-      }
-
-      setMenuList(deepLoopFloat(finalMenus))
-      // 存储处理过后的所有面包屑导航栏到 redux 中
+  // 将菜单数据转换为 antd menu 格式
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  useEffect(() => {
+    if (menuList.length > 0) {
+      setMenuItems(deepLoopFloat(menuList))
+      // 存储面包屑导航栏
       setBreadcrumbList(
         findAllBreadcrumb([
-          ...finalMenus,
+          ...menuList,
           {
             path: '/profile',
             title: '个人中心',
           },
         ])
       )
-      // 把路由菜单处理成一维数组，存储到 redux 中，做菜单权限判断
-      const dynamicRouter = handleRouter(finalMenus)
-      setAuthRouter(dynamicRouter)
-      setMenuListAction(finalMenus)
-    } finally {
-      setLoading(false)
     }
-  }
-  useEffect(() => {
-    setTimeout(() => {
-      getMenuData()
-    }, 500)
-  }, [])
+  }, [menuList])
 
   // 点击当前菜单跳转页面
   const navigate = useNavigate()
   const clickMenu: MenuProps['onClick'] = ({ key }: { key: string }) => {
-    const route = searchRoute(key, useMenuStore.getState().menuList)
+    const route = searchRoute(key, menuList)
     if (route.isLink) window.open(route.isLink, '_blank')
     navigate(key)
   }
 
   return (
     <div className="menu">
-      <Spin spinning={loading} tip="Loading...">
-        <Logo></Logo>
-        <Menu
-          mode="inline"
-          triggerSubMenuAction="click"
-          openKeys={openKeys}
-          selectedKeys={selectedKeys}
-          items={menuList}
-          onClick={clickMenu}
-          onOpenChange={onOpenChange}></Menu>
-      </Spin>
+      <Logo></Logo>
+      <Menu
+        mode="inline"
+        triggerSubMenuAction="click"
+        openKeys={openKeys}
+        selectedKeys={selectedKeys}
+        items={menuItems}
+        onClick={clickMenu}
+        onOpenChange={onOpenChange}></Menu>
     </div>
   )
 }

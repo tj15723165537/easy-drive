@@ -117,13 +117,6 @@ CREATE TABLE `t_car_model` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='车型表';
 
 -- ----------------------------
--- Records of t_role_menu for new menu
--- ----------------------------
-BEGIN;
-INSERT INTO `t_role_menu` (`role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (1, 85, NOW(), NOW(), 0);
-COMMIT;
-
--- ----------------------------
 -- Table structure for t_role
 -- ----------------------------
 DROP TABLE IF EXISTS `t_role`;
@@ -174,6 +167,7 @@ INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_ti
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (559, 1, 81, '2026-03-12 10:18:58', '2026-03-12 10:18:58', 0);
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (560, 1, 82, '2026-03-12 10:18:58', '2026-03-12 10:18:58', 0);
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (561, 1, 84, '2026-03-12 10:18:58', '2026-03-12 10:18:58', 0);
+INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (562, 1, 85, '2026-03-12 10:18:58', '2026-03-12 10:18:58', 0);
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (565, 2, 83, '2026-03-12 10:19:09', '2026-03-12 10:19:09', 0);
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`, `deleted`) VALUES (566, 2, 84, '2026-03-12 10:19:09', '2026-03-12 10:19:09', 0);
 COMMIT;

@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { HOME_URL } from '@/config/config'
 import useTabsStore from '@/store/tabs'
 import useGlobalStore from '@/store'
-import { routerArray } from '@/routers'
+import useMenuStore from '@/store/menu'
 import { searchRoute } from '@/utils/util'
 import MoreButton from './components/MoreButton'
 import './index.less'
@@ -14,6 +14,7 @@ const LayoutTabs = () => {
   const tabsList = useTabsStore((s) => s.tabsList)
   const setTabsList = useTabsStore((s) => s.setTabsList)
   const themeConfig = useGlobalStore((s) => s.themeConfig)
+  const menuList = useMenuStore((s) => s.menuList)
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const [activeValue, setActiveValue] = useState<string>(pathname)
@@ -29,10 +30,10 @@ const LayoutTabs = () => {
 
   // Add tabs
   const addTabs = () => {
-    const route = searchRoute(pathname, routerArray)
+    const route = searchRoute(pathname, menuList as any)
     let newTabsList = JSON.parse(JSON.stringify(tabsList))
     if (tabsList.every((item: any) => item.path !== route.path)) {
-      newTabsList.push({ title: route.meta!.title, path: route.path })
+      newTabsList.push({ title: route.meta?.title || route.path, path: route.path })
     }
     setTabsList(newTabsList)
     setActiveValue(pathname)

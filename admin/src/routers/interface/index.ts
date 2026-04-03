@@ -3,6 +3,7 @@ export interface MetaProps {
 	requiresAuth?: boolean;
 	title: string;
 	key?: string;
+	icon?: string;
 }
 
 export interface RouteObject {

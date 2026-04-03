@@ -1,6 +1,6 @@
 import { searchRoute } from '@/utils/util'
 import { useLocation } from 'react-router-dom'
-import { routerArray } from '@/routers'
+import useMenuStore from '@/store/menu'
 import useAuthStore from '@/store/auth'
 
 /**
@@ -8,10 +8,11 @@ import useAuthStore from '@/store/auth'
  * */
 const useAuthButtons = () => {
   const { pathname } = useLocation()
-  const route = searchRoute(pathname, routerArray)
+  const menuList = useMenuStore((s) => s.menuList)
+  const route = searchRoute(pathname, menuList as any)
 
   return {
-    BUTTONS: useAuthStore.getState().authButtons[route.meta!.key!] || {},
+    BUTTONS: useAuthStore.getState().authButtons[route.meta?.key || ''] || {},
   }
 }
 
