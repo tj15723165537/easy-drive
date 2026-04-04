@@ -51,7 +51,8 @@ const LayoutMenu = () => {
 
   // 动态渲染 Icon 图标
   const customIcons: { [key: string]: any } = Icons
-  const addIcon = (name: string) => {
+  const addIcon = (name?: string) => {
+    if (!name) return null
     return React.createElement(customIcons[name])
   }
 
@@ -59,8 +60,8 @@ const LayoutMenu = () => {
   const deepLoopFloat = (menuList: Menu.MenuOptions[], newArr: MenuItem[] = []) => {
     menuList.forEach((item: Menu.MenuOptions) => {
       // 下面判断代码解释 *** !item?.children?.length   ==>   (!item.children || item.children.length === 0)
-      if (!item?.children?.length) return newArr.push(getItem(item.title, item.path, addIcon(item.icon!)))
-      newArr.push(getItem(item.title, item.path, addIcon(item.icon!), deepLoopFloat(item.children)))
+      if (!item?.children?.length) return newArr.push(getItem(item.title, item.path, addIcon(item.icon)))
+      newArr.push(getItem(item.title, item.path, addIcon(item.icon), deepLoopFloat(item.children)))
     })
     return newArr
   }
@@ -87,7 +88,7 @@ const LayoutMenu = () => {
   const navigate = useNavigate()
   const clickMenu: MenuProps['onClick'] = ({ key }: { key: string }) => {
     const route = searchRoute(key, menuList)
-    if (route.isLink) window.open(route.isLink, '_blank')
+    if (route?.isLink) window.open(route.isLink, '_blank')
     navigate(key)
   }
 

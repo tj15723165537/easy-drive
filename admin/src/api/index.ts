@@ -56,7 +56,7 @@ class RequestHttp {
         // * 在请求结束后，移除本次请求(关闭loading)
         axiosCanceler.removePending(config)
         tryHideFullScreenLoading()
-       if (data.code == ResultEnum.UNAUTHORIZED) {
+        if (data.code == ResultEnum.UNAUTHORIZED) {
           useGlobalStore.getState().setToken('')
           message.error(response.data.message || '登录失效，请重新登录')
           window.location.hash = '/login'

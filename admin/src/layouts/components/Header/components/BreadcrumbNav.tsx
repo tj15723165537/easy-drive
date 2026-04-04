@@ -15,13 +15,15 @@ const BreadcrumbNav = () => {
       title: <a href={`#${HOME_URL}`}>首页</a>,
       key: HOME_URL,
     },
-    ...breadcrumbList.map((item: any) => ({
+    ...(breadcrumbList || []).map((item: any) => ({
       title: item !== '首页' ? item : null,
       key: item,
     })),
   ].filter((item) => item.title)
 
-  return <>{!themeConfig.breadcrumb && <Breadcrumb items={items} />}</>
+  if (!themeConfig?.breadcrumb) return null
+
+  return <Breadcrumb items={items} />
 }
 
 export default BreadcrumbNav

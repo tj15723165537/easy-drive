@@ -1,6 +1,6 @@
 import { useRef } from 'react'
-import { Avatar, Dropdown, message, Modal } from 'antd'
-import { ExclamationCircleOutlined, UserOutlined } from '@ant-design/icons'
+import { Avatar, Dropdown, Modal, message } from 'antd'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import useGlobalStore from '@/store'
 import PasswordModal from './PasswordModal'
@@ -29,7 +29,7 @@ const AvatarIcon = () => {
   // 退出登录
   const logout = () => {
     Modal.confirm({
-      title: '温馨提示 🧡',
+      title: '温馨提示',
       icon: <ExclamationCircleOutlined />,
       content: '是否确认退出登录？',
       okText: '确认',

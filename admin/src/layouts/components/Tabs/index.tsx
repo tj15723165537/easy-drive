@@ -31,9 +31,11 @@ const LayoutTabs = () => {
   // Add tabs
   const addTabs = () => {
     const route = searchRoute(pathname, menuList as any)
+    // 如果菜单未加载或未找到路由，不添加 tabs
+    if (!route || !route.path) return
     let newTabsList = JSON.parse(JSON.stringify(tabsList))
     if (tabsList.every((item: any) => item.path !== route.path)) {
-      newTabsList.push({ title: route.meta?.title || route.path, path: route.path })
+      newTabsList.push({ title: route.title || route.path, path: route.path })
     }
     setTabsList(newTabsList)
     setActiveValue(pathname)
