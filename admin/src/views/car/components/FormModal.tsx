@@ -1,5 +1,6 @@
 import React, { Ref, useImperativeHandle, useMemo, useState } from 'react'
-import { Form, Input, InputNumber, message, Modal, Select, Spin, Upload, Row, Col } from 'antd'
+import { DatePicker, Form, Input, InputNumber, message, Modal, Select, Spin, Upload, Row, Col } from 'antd'
+import dayjs from 'dayjs'
 import { createCar, getCarDetail, updateCar, CarDTO } from '@/api/modules/car'
 import { ModalTitleMap } from '@/const/formModal'
 import { useRequest } from 'ahooks'
@@ -43,7 +44,7 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
   const [id, setId] = useState<number>()
   const [uploading, setUploading] = useState(false)
   const [imageUrls, setImageUrls] = useState<string[]>([])
-  const [selectedBrand, setSelectedBrand] = useState<string>()
+  const [selectedBrandId, setSelectedBrandId] = useState<number>()
   const isDisabled = useMemo(() => {
     return actionType === 'view'
   }, [actionType])
@@ -58,10 +59,10 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
   const brandOptions = useMemo(() => {
     if (!treeData?.data) return []
     return treeData.data.map((item) => ({
-      value: item.value,
+      value: Number(item.value),
       label: item.label,
       children: item.children?.map((child) => ({
-        value: child.value,
+        value: Number(child.value),
         label: child.label,
       })),
     }))
@@ -69,30 +70,33 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
 
   // 当前选中品牌的车型列表
   const modelOptions = useMemo(() => {
-    if (!selectedBrand || !treeData?.data) return []
-    const brandItem = treeData.data.find((item) => item.value === selectedBrand)
+    if (!selectedBrandId || !treeData?.data) return []
+    const brandItem = treeData.data.find((item) => Number(item.value) === selectedBrandId)
     return brandItem?.children || []
-  }, [selectedBrand, treeData])
+  }, [selectedBrandId, treeData])
 
   // 品牌选择变化
-  const handleBrandChange = (value: string) => {
-    setSelectedBrand(value)
-    form.setFieldValue('brand', value)
-    form.setFieldValue('model', undefined)
+  const handleBrandChange = (value: number) => {
+    setSelectedBrandId(value)
+    form.setFieldValue('brandId', value)
+    form.setFieldValue('modelId', undefined)
   }
 
   // 车型选择变化
-  const handleModelChange = (value: string) => {
-    form.setFieldValue('model', value)
+  const handleModelChange = (value: number) => {
+    form.setFieldValue('modelId', value)
   }
 
   const { run: getDetail, loading } = useRequest(
     async (id) => {
       const result = await getCarDetail(id!)
       if (result.data) {
-        form.setFieldsValue({ ...result.data })
-        if (result.data.brand) {
-          setSelectedBrand(result.data.brand)
+        form.setFieldsValue({
+          ...result.data,
+          year: result.data.year ? dayjs().year(result.data.year) : undefined,
+        })
+        if (result.data.brandId) {
+          setSelectedBrandId(result.data.brandId)
         }
         if (result.data.imageList) {
           setImageUrls(result.data.imageList.map(getFullImageUrl))
@@ -108,8 +112,7 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
     if (type === 'add') {
       form.resetFields()
       setId(undefined)
-      setSelectedBrand(undefined)
-      form.setFieldValue('year', new Date().getFullYear())
+      setSelectedBrandId(undefined)
       form.setFieldValue('status', 1) // 默认已上线
       setImageUrls([])
     } else {
@@ -143,6 +146,10 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
     const formData = await form.validateFields()
     // 将图片URL列表转换为逗号分隔的字符串
     formData.images = imageUrls.map(getRelativeImageUrl).join(',')
+    // 将年份 dayjs 对象转换为数字
+    if (formData.year) {
+      formData.year = dayjs(formData.year).year()
+    }
     handleSubmit(actionType, formData)
   }
 
@@ -212,13 +219,13 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
         <Form form={form} labelCol={{ span: 5 }}>
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item name="brand" label="品牌" rules={[{ required: true, message: '请选择品牌' }]}>
+              <Form.Item name="brandId" label="品牌" rules={[{ required: true, message: '请选择品牌' }]}>
                 <Select
                   placeholder="请选择品牌"
                   disabled={isDisabled}
                   showSearch
                   filterOption={(input, option) =>
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    (option?.label as string ?? '').toLowerCase().includes(input.toLowerCase())
                   }
                   onChange={handleBrandChange}
                 >
@@ -233,13 +240,13 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
           </Row>
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item name="model" label="车型" rules={[{ required: true, message: '请选择车型' }]}>
+              <Form.Item name="modelId" label="车型" rules={[{ required: true, message: '请选择车型' }]}>
                 <Select
-                  placeholder={selectedBrand ? '请选择车型' : '请先选择品牌'}
-                  disabled={isDisabled || !selectedBrand}
+                  placeholder={selectedBrandId ? '请选择车型' : '请先选择品牌'}
+                  disabled={isDisabled || !selectedBrandId}
                   showSearch
                   filterOption={(input, option) =>
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    (option?.label as string ?? '').toLowerCase().includes(input.toLowerCase())
                   }
                   onChange={handleModelChange}
                 >
@@ -259,13 +266,7 @@ const FormModal = ({ myRef, onRefresh }: Props) => {
             <InputNumber placeholder="请输入里程数" style={{ width: '100%' }} min={0} disabled={isDisabled} />
           </Form.Item>
           <Form.Item name="year" label="年份" rules={[{ required: true, message: '请选择年份' }]}>
-            <InputNumber
-              placeholder="请选择年份"
-              style={{ width: '100%' }}
-              min={1900}
-              max={2030}
-              disabled={isDisabled}
-            />
+            <DatePicker.YearPicker placeholder="请选择年份" style={{ width: '100%' }} disabled={isDisabled} />
           </Form.Item>
           <Form.Item name="fuelType" label="燃料类型">
             <Select placeholder="请选择燃料类型" style={{ width: '100%' }} disabled={isDisabled} allowClear>

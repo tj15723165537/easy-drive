@@ -11,8 +11,10 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 @TableName("t_car")
 public class Car extends BaseEntity {
-    private String brand;
-    private String model;
+    private String brandName;
+    private String modelName;
+    private Integer brandId;
+    private Integer modelId;
     private BigDecimal price;
     private Integer mileage;
     private Integer year;

@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 @Schema(description = "更新车辆请求")
 public class CarUpdateDTO {
 
-    @Schema(description = "品牌", example = "丰田")
-    private String brand;
+    @Schema(description = "品牌ID", example = "1")
+    private Integer brandId;
 
-    @Schema(description = "车型", example = "卡罗拉")
-    private String model;
+    @Schema(description = "车型ID", example = "1")
+    private Integer modelId;
 
     @Schema(description = "价格(元)", example = "100000")
     private BigDecimal price;

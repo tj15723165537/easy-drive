@@ -1,6 +1,6 @@
 .home {
   height: 100%;
-  background: #fff;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 0;
 
   .home-content {
@@ -10,83 +10,72 @@
     justify-content: center;
     align-items: center;
     padding: 40px;
+    gap: 48px;
   }
 
   .welcome-section {
     text-align: center;
-    margin-bottom: 48px;
+    animation: fadeInUp 0.6s ease-out;
 
     .welcome-title {
-      font-size: 28px;
-      font-weight: 600;
-      color: #1a1a1a;
-      margin: 0 0 12px 0;
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 16px 0;
+      letter-spacing: 1px;
     }
 
     .welcome-subtitle {
-      font-size: 15px;
-      color: #666;
+      font-size: 16px;
+      color: #64748b;
       margin: 0;
+      letter-spacing: 2px;
     }
   }
 
-  .info-cards {
+  .date-card {
     display: flex;
-    gap: 32px;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 64px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    animation: fadeInUp 0.6s ease-out 0.1s both;
 
-    .info-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 28px 36px;
-      border-radius: 12px;
-      background: #fafafa;
-      min-width: 160px;
+    .date-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
 
-      .info-card-icon {
-        font-size: 32px;
-        margin-bottom: 12px;
-      }
+    .date-main {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1e293b;
+      letter-spacing: 2px;
+    }
 
-      .info-card-content {
-        .info-card-label {
-          font-size: 12px;
-          color: #999;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          margin-bottom: 8px;
-        }
-
-        .info-card-value {
-          font-size: 22px;
-          font-weight: 600;
-          color: #1a1a1a;
-
-          &.time {
-            font-family: 'SF Mono', 'Menlo', monospace;
-            font-size: 20px;
-          }
-        }
-
-        .info-card-weekday,
-        .info-card-desc {
-          font-size: 13px;
-          color: #666;
-          margin-top: 4px;
-        }
-      }
-
-      .info-card-extra {
-        margin-top: 6px;
-        font-size: 12px;
-        color: #999;
-      }
+    .date-week {
+      font-size: 18px;
+      color: #64748b;
+      font-weight: 500;
     }
   }
 }
 
-.weather-error {
-  color: #bfbfbf;
-  font-size: 13px;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

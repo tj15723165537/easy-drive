@@ -2,11 +2,10 @@ package com.easy.drive.serve.modules.car.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.easy.drive.serve.modules.car.dto.CarCreateDTO;
+import com.easy.drive.serve.modules.car.dto.CarSearchDTO;
 import com.easy.drive.serve.modules.car.dto.CarUpdateDTO;
 import com.easy.drive.serve.modules.car.vo.CarInfoVO;
 import com.easy.drive.serve.modules.car.vo.CarPageVO;
-
-import java.math.BigDecimal;
 
 public interface ICarService {
 
@@ -18,8 +17,7 @@ public interface ICarService {
 
     CarInfoVO getCarById(Long id);
 
-    CarPageVO searchCars(Integer pageNum, Integer pageSize, String brand, String model,
-                       BigDecimal minPrice, BigDecimal maxPrice, Integer year);
+    CarPageVO searchCars(CarSearchDTO searchDTO);
 
     CarPageVO getMyCars(Integer pageNum, Integer pageSize, Long userId);
 }

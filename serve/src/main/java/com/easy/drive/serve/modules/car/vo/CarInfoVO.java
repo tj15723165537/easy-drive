@@ -14,11 +14,17 @@ public class CarInfoVO {
     @Schema(description = "车辆ID", example = "1")
     private Long id;
 
-    @Schema(description = "品牌", example = "丰田")
-    private String brand;
+    @Schema(description = "品牌ID", example = "1")
+    private Integer brandId;
 
-    @Schema(description = "车型", example = "卡罗拉")
-    private String model;
+    @Schema(description = "品牌名称", example = "丰田")
+    private String brandName;
+
+    @Schema(description = "车型ID", example = "1")
+    private Integer modelId;
+
+    @Schema(description = "车型名称", example = "卡罗拉")
+    private String modelName;
 
     @Schema(description = "价格(元)", example = "100000")
     private BigDecimal price;
@@ -44,7 +50,7 @@ public class CarInfoVO {
     @Schema(description = "提车地址", example = "北京市朝阳区")
     private String pickupLocation;
 
-    @Schema(description = "状态：1-已上线，0-已下下线", example = "1")
+    @Schema(description = "状态：1-已上线，0-已下线", example = "1")
     private Integer status;
 
     @Schema(description = "发布用户ID", example = "1")

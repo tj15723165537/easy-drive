@@ -1,10 +1,13 @@
 import http from '@/api'
 import { BaseParams, ResPage } from '@/api/interface'
+import { Dayjs } from 'dayjs'
 
 export interface CarVO {
   id: number
-  brand: string
-  model: string
+  brandName: string
+  modelName: string
+  brandId: number
+  modelId: number
   price: number
   mileage: number
   year: number
@@ -22,11 +25,11 @@ export interface CarVO {
 
 export interface CarDTO {
   id?: number
-  brand?: string
-  model?: string
+  brandId?: number
+  modelId?: number
   price?: number
   mileage?: number
-  year?: number
+  year?: number | Dayjs
   fuelType?: string
   transmission?: string
   description?: string
@@ -36,11 +39,10 @@ export interface CarDTO {
 }
 
 export interface CarPageParams extends BaseParams {
-  brand?: string
-  model?: string
-  minPrice?: number
-  maxPrice?: number
+  brandId?: number
+  modelId?: number
   year?: number
+  status?: number
 }
 
 export const searchCars = (params: CarPageParams) => {

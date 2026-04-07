@@ -5,7 +5,7 @@ import { getUserInfoApi, updateProfileApi } from '@/api/modules/login'
 import useGlobalStore from '@/store'
 import type { UploadChangeParam } from 'antd/es/upload'
 import type { UploadFile, UploadProps } from 'antd'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import './index.less'
 
 // 用户信息接口
@@ -209,7 +209,7 @@ const Profile = () => {
                   <Descriptions.Item label="账号">{userInfo?.username}</Descriptions.Item>
                   <Descriptions.Item label="昵称">{userInfo?.nickname}</Descriptions.Item>
                   <Descriptions.Item label="手机号">{userInfo?.phone}</Descriptions.Item>
-                  <Descriptions.Item label="注册时间">{userInfo?.createTime ? moment(userInfo.createTime).format('YYYY-MM-DD HH:mm:ss') : ''}</Descriptions.Item>
+                  <Descriptions.Item label="注册时间">{userInfo?.createTime ? dayjs(userInfo.createTime).format('YYYY-MM-DD HH:mm:ss') : ''}</Descriptions.Item>
                 </Descriptions>
               )}
 

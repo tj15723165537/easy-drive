@@ -2,13 +2,13 @@ package com.easy.drive.serve.modules.car.controller;
 
 import com.easy.drive.serve.common.result.Result;
 import com.easy.drive.serve.modules.car.dto.CarCreateDTO;
+import com.easy.drive.serve.modules.car.dto.CarSearchDTO;
 import com.easy.drive.serve.modules.car.dto.CarUpdateDTO;
 import com.easy.drive.serve.modules.car.service.ICarService;
 import com.easy.drive.serve.modules.car.vo.CarInfoVO;
 import com.easy.drive.serve.modules.car.vo.CarPageVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,19 +55,9 @@ public class CarController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "搜索车辆", description = "根据品牌、价格区间、年份等条件搜索车辆")
-    public Result<CarPageVO> searchCars(
-            @Parameter(description = "页码", example = "1") @RequestParam(defaultValue = "1") Integer pageNum,
-            @Parameter(description = "每页大小", example = "10") @RequestParam(defaultValue = "10") Integer pageSize,
-            @Parameter(description = "品牌", example = "丰田") @RequestParam(required = false) String brand,
-            @Parameter(description = "车型", example = "卡罗拉") @RequestParam(required = false) String model,
-            @Parameter(description = "最低价格", example = "50000") @RequestParam(required = false) Double minPrice,
-            @Parameter(description = "最高价格", example = "200000") @RequestParam(required = false) Double maxPrice,
-            @Parameter(description = "年份", example = "2020") @RequestParam(required = false) Integer year) {
-        CarPageVO page = carService.searchCars(pageNum, pageSize, brand, model,
-                minPrice != null ? java.math.BigDecimal.valueOf(minPrice) : null,
-                maxPrice != null ? java.math.BigDecimal.valueOf(maxPrice) : null,
-                year);
+    @Operation(summary = "搜索车辆", description = "根据品牌、年份等条件搜索车辆")
+    public Result<CarPageVO> searchCars(CarSearchDTO searchDTO) {
+        CarPageVO page = carService.searchCars(searchDTO);
         return Result.success(page);
     }
 

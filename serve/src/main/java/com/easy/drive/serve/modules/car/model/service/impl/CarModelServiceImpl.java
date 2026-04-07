@@ -67,7 +67,7 @@ public class CarModelServiceImpl implements ICarModelService {
         // 按品牌分组
         return brands.stream().map(brand -> {
             CarModelTreeVO treeVO = new CarModelTreeVO();
-            treeVO.setValue(brand.getName());
+            treeVO.setValue(brand.getId());
             treeVO.setLabel(brand.getName());
 
             List<CarModel> brandModels = allModels.stream()
@@ -77,7 +77,7 @@ public class CarModelServiceImpl implements ICarModelService {
             List<CarModelTreeVO.CarModelChildVO> children = brandModels.stream()
                     .map(m -> {
                         CarModelTreeVO.CarModelChildVO child = new CarModelTreeVO.CarModelChildVO();
-                        child.setValue(m.getName());
+                        child.setValue(m.getId());
                         child.setLabel(m.getName());
                         return child;
                     })

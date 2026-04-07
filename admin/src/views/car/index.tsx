@@ -1,13 +1,28 @@
-import React, { useRef, useState } from 'react'
-import { TableColumnsType, Tag, Select } from 'antd'
-import { Button, Card, Col, Form, Input, InputNumber, message, Popconfirm, Row, Space, Table } from 'antd'
+import React, { useRef, useState, useMemo } from 'react'
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Form,
+  message,
+  Popconfirm,
+  Row,
+  Select,
+  Space,
+  Table,
+  TableColumnsType,
+  Tag,
+} from 'antd'
 import FormModal from './components/FormModal'
 import DetailModal from './components/DetailModal'
 import { SearchColSpan } from '@/config/layout'
-import { deleteCar, getCarDetail, searchCars, CarPageParams, CarVO } from '@/api/modules/car'
-import { useRequest } from 'ahooks'
+import { CarPageParams, CarVO, deleteCar, getCarDetail, searchCars } from '@/api/modules/car'
+import { getBrandList, getModelList } from '@/api/modules/carModel'
 import { usePagination } from 'ahooks'
-import { BaseParams, ResPage } from '@/api/interface'
+import { useRequest } from 'ahooks'
+import { CarBrandVO, CarModelVO } from '@/api/modules/carModel'
+import dayjs from 'dayjs'
 
 const { Option } = Select
 
@@ -16,6 +31,34 @@ const CarPagePage = () => {
   const [detailVisible, setDetailVisible] = useState(false)
   const [detailData, setDetailData] = useState<CarVO | null>(null)
   const [form] = Form.useForm()
+  const [selectedBrandId, setSelectedBrandId] = useState<number>()
+
+  // 获取品牌列表
+  const { data: brandList } = useRequest(getBrandList)
+
+  // 获取车型列表（根据品牌筛选）
+  const { data: modelList } = useRequest(
+    () => getModelList(selectedBrandId),
+    { ready: !!selectedBrandId }
+  )
+
+  // 品牌选项
+  const brandOptions = useMemo(() => {
+    if (!brandList?.data) return []
+    return brandList.data.map((item: CarBrandVO) => ({
+      value: item.id,
+      label: item.name,
+    }))
+  }, [brandList])
+
+  // 车型选项
+  const modelOptions = useMemo(() => {
+    if (!modelList?.data) return []
+    return modelList.data.map((item: CarModelVO) => ({
+      value: item.id,
+      label: item.name,
+    }))
+  }, [modelList])
 
   const showEditModal = (id?: number) => {
     formModalRef.current.showModal('edit', id)
@@ -36,8 +79,8 @@ const CarPagePage = () => {
   }
 
   const columns: TableColumnsType<CarVO> = [
-    { title: '品牌', dataIndex: 'brand', align: 'center', width: 120 },
-    { title: '车型', dataIndex: 'model', align: 'center', width: 150 },
+    { title: '品牌', dataIndex: 'brandName', align: 'center', width: 120 },
+    { title: '车型', dataIndex: 'modelName', align: 'center', width: 150 },
     {
       title: '价格',
       dataIndex: 'price',
@@ -83,18 +126,28 @@ const CarPagePage = () => {
     },
   ]
 
-  const { data, loading, pagination, run, refresh } = usePagination<ResPage<CarVO>, [BaseParams]>(async (params) => {
-    const searchParams: CarPageParams = form.getFieldsValue()
+  const { data, loading, pagination, run, refresh } = usePagination<any, []>(async (params) => {
+    const searchParams = form.getFieldsValue()
+    // 将年份 dayjs 对象转换为数字
+    if (searchParams.year) {
+      searchParams.year = dayjs(searchParams.year).year()
+    }
     const result = await searchCars({ ...params, ...searchParams })
     return result.data!
   })
 
   const handleReset = () => {
     form.resetFields()
-    setTimeout(() => {
-      run({ current: 1, pageSize: pagination.pageSize })
-    })
+    setSelectedBrandId(undefined)
+    run({ current: 1, pageSize: pagination.pageSize })
   }
+
+  const handleBrandChange = (value: number) => {
+    setSelectedBrandId(value)
+    form.setFieldValue('modelId', undefined)
+    form.setFieldValue('brandId', value)
+  }
+
   const handleSearch = () => {
     run({ current: 1, pageSize: pagination.pageSize })
   }
@@ -105,28 +158,48 @@ const CarPagePage = () => {
         <Form form={form} onFinish={handleSearch} layout="inline">
           <Row gutter={[16, 16]} style={{ width: '100%' }}>
             <Col {...SearchColSpan}>
-              <Form.Item name="brand" label="品牌">
-                <Input placeholder="请输入品牌" />
+              <Form.Item name="brandId" label="品牌">
+                <Select
+                  placeholder="请选择品牌"
+                  style={{ width: '100%' }}
+                  allowClear
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label as string ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  onChange={handleBrandChange}
+                >
+                  {brandOptions.map((item) => (
+                    <Option key={item.value} value={item.value} label={item.label}>
+                      {item.label}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col {...SearchColSpan}>
-              <Form.Item name="model" label="车型">
-                <Input placeholder="请输入车型" />
-              </Form.Item>
-            </Col>
-            <Col {...SearchColSpan}>
-              <Form.Item name="minPrice" label="最低价格">
-                <InputNumber placeholder="最低价格" style={{ width: '100%' }} min={0} />
-              </Form.Item>
-            </Col>
-            <Col {...SearchColSpan}>
-              <Form.Item name="maxPrice" label="最高价格">
-                <InputNumber placeholder="最高价格" style={{ width: '100%' }} min={0} />
+              <Form.Item name="modelId" label="车型">
+                <Select
+                  placeholder={selectedBrandId ? '请选择车型' : '请先选择品牌'}
+                  style={{ width: '100%' }}
+                  allowClear
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label as string ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  disabled={!selectedBrandId}
+                >
+                  {modelOptions.map((item) => (
+                    <Option key={item.value} value={item.value} label={item.label}>
+                      {item.label}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col {...SearchColSpan}>
               <Form.Item name="year" label="年份">
-                <InputNumber placeholder="年份" style={{ width: '100%' }} min={1900} max={2030} />
+                <DatePicker.YearPicker placeholder="请选择年份" style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col {...SearchColSpan}>
@@ -139,7 +212,7 @@ const CarPagePage = () => {
             </Col>
             <Col {...SearchColSpan}>
               <Space>
-                <Button type="primary" onClick={handleSearch}>
+                <Button type="primary" htmlType="submit">
                   查询
                 </Button>
                 <Button onClick={handleReset}>重置</Button>

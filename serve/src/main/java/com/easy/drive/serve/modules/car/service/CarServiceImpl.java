@@ -4,18 +4,23 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.easy.drive.serve.common.constant.ResultCode;
 import com.easy.drive.serve.common.exception.BusinessException;
+import com.easy.drive.serve.modules.auth.mapper.UserMapper;
 import com.easy.drive.serve.modules.car.dto.CarCreateDTO;
+import com.easy.drive.serve.modules.car.dto.CarSearchDTO;
 import com.easy.drive.serve.modules.car.dto.CarUpdateDTO;
 import com.easy.drive.serve.modules.car.entity.Car;
 import com.easy.drive.serve.modules.car.mapper.CarMapper;
+import com.easy.drive.serve.modules.car.model.entity.CarBrand;
+import com.easy.drive.serve.modules.car.model.entity.CarModel;
+import com.easy.drive.serve.modules.car.model.mapper.CarBrandMapper;
+import com.easy.drive.serve.modules.car.model.mapper.CarModelMapper;
 import com.easy.drive.serve.modules.car.vo.CarInfoVO;
 import com.easy.drive.serve.modules.car.vo.CarPageVO;
-import com.easy.drive.serve.modules.auth.mapper.UserMapper;
+import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,17 +29,40 @@ import java.util.stream.Collectors;
 @org.springframework.context.annotation.Primary
 public class CarServiceImpl implements ICarService {
 
-    @Autowired
+    @Resource
     private CarMapper carMapper;
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private CarBrandMapper carBrandMapper;
+
+    @Resource
+    private CarModelMapper carModelMapper;
 
     @Override
     public Long createCar(CarCreateDTO dto, Long userId) {
         Car car = new Car();
-        car.setBrand(dto.getBrand());
-        car.setModel(dto.getModel());
+
+        // 根据 brandId 查询 brandName
+        if (dto.getBrandId() != null) {
+            CarBrand brand = carBrandMapper.selectById(dto.getBrandId());
+            if (brand != null) {
+                car.setBrandName(brand.getName());
+            }
+            car.setBrandId(dto.getBrandId());
+        }
+
+        // 根据 modelId 查询 modelName
+        if (dto.getModelId() != null) {
+            CarModel model = carModelMapper.selectById(dto.getModelId());
+            if (model != null) {
+                car.setModelName(model.getName());
+            }
+            car.setModelId(dto.getModelId());
+        }
+
         car.setPrice(dto.getPrice());
         car.setMileage(dto.getMileage());
         car.setYear(dto.getYear());
@@ -42,8 +70,9 @@ public class CarServiceImpl implements ICarService {
         car.setTransmission(dto.getTransmission());
         car.setDescription(dto.getDescription());
         car.setImages(dto.getImages());
+        car.setPickupLocation(dto.getPickupLocation());
         car.setUserId(userId);
-        car.setStatus(1);
+        car.setStatus(dto.getStatus() != null ? dto.getStatus() : 1);
         carMapper.insert(car);
         return car.getId();
     }
@@ -57,11 +86,28 @@ public class CarServiceImpl implements ICarService {
         if (!existCar.getUserId().equals(userId)) {
             throw new BusinessException("无权限修改此车辆");
         }
-        
+
         Car car = new Car();
         BeanUtils.copyProperties(dto, car);
         car.setId(id);
         car.setUserId(userId);
+
+        // 根据 brandId 查询 brandName
+        if (dto.getBrandId() != null) {
+            CarBrand brand = carBrandMapper.selectById(dto.getBrandId());
+            if (brand != null) {
+                car.setBrandName(brand.getName());
+            }
+        }
+
+        // 根据 modelId 查询 modelName
+        if (dto.getModelId() != null) {
+            CarModel model = carModelMapper.selectById(dto.getModelId());
+            if (model != null) {
+                car.setModelName(model.getName());
+            }
+        }
+
         carMapper.updateById(car);
     }
 
@@ -87,28 +133,28 @@ public class CarServiceImpl implements ICarService {
     }
 
     @Override
-    public CarPageVO searchCars(Integer pageNum, Integer pageSize, String brand, String model,
-                                BigDecimal minPrice, BigDecimal maxPrice, Integer year) {
+    public CarPageVO searchCars(CarSearchDTO searchDTO) {
+        int pageNum = searchDTO.getPageNum() != null ? searchDTO.getPageNum() : 1;
+        int pageSize = searchDTO.getPageSize() != null ? searchDTO.getPageSize() : 10;
+
         Page<Car> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Car> wrapper = new LambdaQueryWrapper<>();
 
-        if (brand != null && !brand.isEmpty()) {
-            wrapper.like(Car::getBrand, brand);
+        if (searchDTO.getBrandId() != null) {
+            wrapper.like(Car::getBrandId, searchDTO.getBrandId());
         }
-        if (model != null && !model.isEmpty()) {
-            wrapper.like(Car::getModel, model);
+        if (searchDTO.getModelId() != null) {
+            wrapper.like(Car::getModelId, searchDTO.getModelId());
         }
-        if (minPrice != null) {
-            wrapper.ge(Car::getPrice, minPrice);
+        if (searchDTO.getYear() != null) {
+            wrapper.eq(Car::getYear, searchDTO.getYear());
         }
-        if (maxPrice != null) {
-            wrapper.le(Car::getPrice, maxPrice);
-        }
-        if (year != null) {
-            wrapper.eq(Car::getYear, year);
+        if (searchDTO.getStatus() != null) {
+            wrapper.eq(Car::getStatus, searchDTO.getStatus());
+        } else {
+            wrapper.eq(Car::getStatus, 1);
         }
 
-        wrapper.eq(Car::getStatus, 1);
         wrapper.orderByDesc(Car::getCreateTime);
 
         Page<Car> carPage = carMapper.selectPage(page, wrapper);
@@ -158,7 +204,7 @@ public class CarServiceImpl implements ICarService {
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
         pageVO.setList(records);
-        
+
         return pageVO;
     }
 }
