@@ -11,7 +11,7 @@ import com.easy.drive.serve.modules.system.user.entity.UserRole;
 import com.easy.drive.serve.modules.system.user.vo.UserVO;
 import com.easy.drive.serve.modules.system.user.entity.User;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 @org.springframework.context.annotation.Primary
 public class SystemUserServiceImpl implements ISystemUserService {
 
-    @Autowired
+    @Resource
     private SystemUserMapper systemUserMapper;
 
-    @Autowired
+    @Resource
     private UserRoleMapper userRoleMapper;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();

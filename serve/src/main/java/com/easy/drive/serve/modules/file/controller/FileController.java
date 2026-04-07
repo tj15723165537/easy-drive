@@ -6,7 +6,7 @@ import com.easy.drive.serve.modules.file.vo.FileUploadVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +17,7 @@ import java.io.IOException;
 @Tag(name = "文件管理", description = "文件上传和删除")
 public class FileController {
 
-    @Autowired
+    @Resource
     private FileUploadService fileUploadService;
 
     @PostMapping("/upload")

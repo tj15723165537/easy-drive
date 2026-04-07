@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.easy.drive.serve.common.exception.BusinessException;
 import com.easy.drive.serve.modules.car.model.dto.CarBrandDTO;
 import com.easy.drive.serve.modules.car.model.entity.CarBrand;
-import com.easy.drive.serve.modules.car.model.entity.CarModel;
 import com.easy.drive.serve.modules.car.model.mapper.CarBrandMapper;
 import com.easy.drive.serve.modules.car.model.mapper.CarModelMapper;
 import com.easy.drive.serve.modules.car.model.service.ICarBrandService;

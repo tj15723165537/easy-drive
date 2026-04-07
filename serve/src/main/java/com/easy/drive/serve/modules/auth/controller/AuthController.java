@@ -12,7 +12,7 @@ import com.easy.drive.serve.modules.system.menu.vo.MenuVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +23,7 @@ import java.util.List;
 @Tag(name = "用户认证", description = "用户注册、登录、信息获取")
 public class AuthController {
 
-    @Autowired
+    @Resource
     private IUserService userService;
 
     @PostMapping("/login")

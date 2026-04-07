@@ -7,7 +7,7 @@ import com.easy.drive.serve.modules.system.menu.entity.Menu;
 import com.easy.drive.serve.modules.system.menu.mapper.MenuMapper;
 import com.easy.drive.serve.modules.system.menu.vo.MenuVO;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @org.springframework.context.annotation.Primary
 public class MenuServiceImpl implements IMenuService {
 
-    @Autowired
+    @Resource
     private MenuMapper menuMapper;
 
     @Override

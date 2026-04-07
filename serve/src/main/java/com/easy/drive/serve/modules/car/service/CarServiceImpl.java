@@ -18,7 +18,6 @@ import com.easy.drive.serve.modules.car.vo.CarInfoVO;
 import com.easy.drive.serve.modules.car.vo.CarPageVO;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -44,6 +43,11 @@ public class CarServiceImpl implements ICarService {
     @Override
     public Long createCar(CarCreateDTO dto, Long userId) {
         Car car = new Car();
+        BeanUtils.copyProperties(dto, car);
+        car.setUserId(userId);
+        if (car.getStatus() == null) {
+            car.setStatus(1);
+        }
 
         // 根据 brandId 查询 brandName
         if (dto.getBrandId() != null) {
@@ -51,7 +55,6 @@ public class CarServiceImpl implements ICarService {
             if (brand != null) {
                 car.setBrandName(brand.getName());
             }
-            car.setBrandId(dto.getBrandId());
         }
 
         // 根据 modelId 查询 modelName
@@ -60,19 +63,8 @@ public class CarServiceImpl implements ICarService {
             if (model != null) {
                 car.setModelName(model.getName());
             }
-            car.setModelId(dto.getModelId());
         }
 
-        car.setPrice(dto.getPrice());
-        car.setMileage(dto.getMileage());
-        car.setYear(dto.getYear());
-        car.setFuelType(dto.getFuelType());
-        car.setTransmission(dto.getTransmission());
-        car.setDescription(dto.getDescription());
-        car.setImages(dto.getImages());
-        car.setPickupLocation(dto.getPickupLocation());
-        car.setUserId(userId);
-        car.setStatus(dto.getStatus() != null ? dto.getStatus() : 1);
         carMapper.insert(car);
         return car.getId();
     }

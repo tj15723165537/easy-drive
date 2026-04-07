@@ -16,7 +16,7 @@ import com.easy.drive.serve.modules.auth.mapper.UserMapper;
 import com.easy.drive.serve.modules.auth.vo.LoginResponseVO;
 import com.easy.drive.serve.modules.auth.vo.UserInfoVO;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +28,16 @@ import java.util.stream.Collectors;
 @org.springframework.context.annotation.Primary
 public class UserServiceImpl implements IUserService {
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
-    @Autowired
+    @Resource
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
+    @Resource
     private JwtUtil jwtUtil;
 
-    @Autowired
+    @Resource
     private MenuMapper menuMapper;
 
     @Override
@@ -56,13 +56,7 @@ public class UserServiceImpl implements IUserService {
         String token = jwtUtil.generateToken(user.getUsername(), user.getId());
 
         UserInfoVO userInfo = new UserInfoVO();
-        userInfo.setId(user.getId());
-        userInfo.setUsername(user.getUsername());
-        userInfo.setNickname(user.getNickname());
-        userInfo.setPhone(user.getPhone());
-        userInfo.setAvatar(user.getAvatar());
-        userInfo.setStatus(user.getStatus());
-        userInfo.setCreateTime(user.getCreateTime());
+        BeanUtils.copyProperties(user, userInfo);
 
         LoginResponseVO response = new LoginResponseVO();
         response.setToken(token);
@@ -80,9 +74,8 @@ public class UserServiceImpl implements IUserService {
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
+        BeanUtils.copyProperties(request, user);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setPhone(request.getPhone());
         user.setNickname(request.getNickname() != null ? request.getNickname() : request.getUsername());
         user.setStatus(1);
 
@@ -97,13 +90,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         UserInfoVO userInfo = new UserInfoVO();
-        userInfo.setId(user.getId());
-        userInfo.setUsername(user.getUsername());
-        userInfo.setNickname(user.getNickname());
-        userInfo.setPhone(user.getPhone());
-        userInfo.setAvatar(user.getAvatar());
-        userInfo.setStatus(user.getStatus());
-        userInfo.setCreateTime(user.getCreateTime());
+        BeanUtils.copyProperties(user, userInfo);
         return userInfo;
     }
 
@@ -140,10 +127,7 @@ public class UserServiceImpl implements IUserService {
             throw new BusinessException(ResultCode.USER_NOT_EXIST);
         }
 
-        // 更新昵称、手机号和头像
-        user.setNickname(dto.getNickname());
-        user.setPhone(dto.getPhone());
-        user.setAvatar(dto.getAvatar());
+        BeanUtils.copyProperties(dto, user);
         userMapper.updateById(user);
     }
 

@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "菜单管理", description = "系统菜单的增删改查")
 public class MenuController {
 
-    @Autowired
+    @Resource
     private IMenuService menuService;
 
     @GetMapping("/list")

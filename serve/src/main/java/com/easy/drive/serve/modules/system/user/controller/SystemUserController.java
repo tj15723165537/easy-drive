@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "用户管理", description = "系统用户的增删改查")
 public class SystemUserController {
 
-    @Autowired
+    @Resource
     private ISystemUserService userService;
 
     @GetMapping("/page")

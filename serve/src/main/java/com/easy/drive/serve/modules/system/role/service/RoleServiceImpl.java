@@ -11,7 +11,7 @@ import com.easy.drive.serve.modules.system.role.mapper.RoleMapper;
 import com.easy.drive.serve.modules.system.role.mapper.RoleMenuMapper;
 import com.easy.drive.serve.modules.system.role.vo.RoleVO;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 @org.springframework.context.annotation.Primary
 public class RoleServiceImpl implements IRoleService {
 
-    @Autowired
+    @Resource
     private RoleMapper roleMapper;
 
-    @Autowired
+    @Resource
     private RoleMenuMapper roleMenuMapper;
 
     @Override
