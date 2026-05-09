@@ -27,7 +27,7 @@ const FormModal = ({ myRef, onRefresh, treeData }: Props) => {
       const result = await getMenuDetail(id!)
       form.setFieldsValue({
         ...result.data,
-        parent_id: result.data?.parent_id === 0 ? undefined : result.data?.parent_id,
+        parentId: result.data?.parentId === 0 ? undefined : result.data?.parentId,
       })
     },
     { manual: true }
@@ -81,7 +81,7 @@ const FormModal = ({ myRef, onRefresh, treeData }: Props) => {
       }}>
       <Spin spinning={loading}>
         <Form form={form} labelCol={{ span: 4 }}>
-          <Form.Item name="parent_id" label="父级菜单">
+          <Form.Item name="parentId" label="父级菜单">
             <TreeSelect
               treeData={treeData}
               disabled={isDisabled}

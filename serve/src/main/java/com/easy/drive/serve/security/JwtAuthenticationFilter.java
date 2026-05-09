@@ -1,6 +1,11 @@
 package com.easy.drive.serve.security;
 
+import com.easy.drive.serve.common.constant.ResultCode;
 import com.easy.drive.serve.common.util.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -21,20 +28,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Resource
     private JwtUtil jwtUtil;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = extractToken(request);
-        if (token != null && jwtUtil.validateToken(token)) {
-            Long userId = jwtUtil.getUserIdFromToken(token);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userId,
-                    null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (token != null) {
+            try {
+                if (jwtUtil.validateToken(token)) {
+                    Long userId = jwtUtil.getUserIdFromToken(token);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userId,
+                            null,
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    writeUnauthorizedResponse(response, ResultCode.UNAUTHORIZED.getMessage());
+                    return;
+                }
+            } catch (ExpiredJwtException e) {
+                writeUnauthorizedResponse(response, "Token已过期，请重新登录");
+                return;
+            } catch (MalformedJwtException | SignatureException e) {
+                writeUnauthorizedResponse(response, "Token无效，请重新登录");
+                return;
+            } catch (Exception e) {
+                writeUnauthorizedResponse(response, ResultCode.UNAUTHORIZED.getMessage());
+                return;
+            }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void writeUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json;charset=UTF-8");
+        Map<String, Object> body = new HashMap<>();
+        body.put("code", ResultCode.UNAUTHORIZED.getCode());
+        body.put("message", message);
+        body.put("timestamp", System.currentTimeMillis());
+        response.getWriter().write(objectMapper.writeValueAsString(body));
     }
 
     private String extractToken(HttpServletRequest request) {

@@ -3,19 +3,19 @@ import { BaseParams, ResPage } from '@/api/interface'
 
 export interface MenuVO {
   id: number
-  parent_id: number
+  parentId: number
   title: string
   icon: string
   path: string
   sort: number
-  create_at: string
-  update_at: string
+  createTime: string
+  updateTime: string
   children: MenuVO[]
 }
 
 export interface MenuDTO {
   id?: number
-  parent_id?: number
+  parentId?: number
   title?: string
   icon?: string
   path?: string

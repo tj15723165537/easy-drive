@@ -39,7 +39,7 @@ importers:
         specifier: ^21.8.10
         version: 21.10.0
       moment:
-        specifier: ^2.29.3
+        specifier: ^2.30.1
         version: 2.30.1
       nprogress:
         specifier: ^0.2.0
